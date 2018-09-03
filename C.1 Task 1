@@ -10,9 +10,12 @@ import signal
 
 print("Press Ctrl+C to exit.")
 
-x = 0
-y = 0
-  
+x = 0.0
+y = 0.0
+
+start_time = time.time()
+elapsed_time = start_time - time.time()
+
 # Pins that the encoders are connected to
 LENCODER = 17
 RENCODER = 18
@@ -20,12 +23,12 @@ RENCODER = 18
 # This function is called when the left encoder detects a rising edge signal.
 def onLeftEncode(pin):
     print("Left encoder ticked!")
-    x =+ 1;
+    x =+ 0.512; # in inches
 
 # This function is called when the right encoder detects a rising edge signal.
 def onRightEncode(pin):
     print("Right encoder ticked!")
-    y =+ 1;
+    y =+ 0.512; # in inches
 
 # This function is called when Ctrl+C is pressed.
 # It's intended for properly exiting the program.
@@ -40,6 +43,11 @@ signal.signal(signal.SIGINT, ctrlC)
 # Set the pin numbering scheme to the numbering shown on the robot itself.
 GPIO.setmode(GPIO.BCM)
 
+setSpeeds(0,100)
+time.sleep(1)
+
+# need some sort of function to calculate the revolutions per second vs time to get speed
+
 # Set encoder pins as input
 # Also enable pull-up resistors on the encoder pins
 # This ensures a clean 0V and 3.3V is always outputted from the encoders.
@@ -51,13 +59,8 @@ GPIO.add_event_detect(LENCODER, GPIO.RISING, onLeftEncode)
 GPIO.add_event_detect(RENCODER, GPIO.RISING, onRightEncode)
 
 # Prevent the program from exiting by adding a looping delay.
-time.sleep(1)
-start_time = time.time()
-elapsed_time = start_time - time.time()
-
 while True:
-	setSpeeds(0,100)
-	time.sleep(0.3)
-  if elapsed_time == 10
-    break
-  
+    time.sleep(0.3)
+    if elapsed_time == 10
+        break
+	
