@@ -32,11 +32,14 @@ def onRightEncode(pin):
     if (len(velArrayRight) > 5):
         velArrayRight = velArrayRight[1:6]
 
-#def initEncoders():
-#    while True:
-#        time.sleep(0.25)
-#        resetTempCounts()
-#        tempStartTime = time.time()
+def initEncoders():
+    velArrayRight = []
+    velArrayLeft = []
+    rightTicks = 0
+    leftTicks = 0
+    tempRightTicks = 0
+    tempLeftTicks = 0
+    startTime = time.time()
 
 def resetCounts():
     rightTicks = 0

@@ -31,6 +31,7 @@ GPIO.setup(RENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(LENCODER, GPIO.RISING, encoders.onLeftEncode)
 GPIO.add_event_detect(RENCODER, GPIO.RISING, encoders.onRightEncode)
 
+encoders.initEncoders
 while True:
     print("running")
     time.sleep(1)
