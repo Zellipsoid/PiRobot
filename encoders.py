@@ -12,7 +12,7 @@ leftTicks = 0
 tempRightTicks = 0
 tempLeftTicks = 0
 startTime = time.time()
-tempStartTime
+#tempStartTime = time.time();
 
 # This function is called when the left encoder detects a rising edge signal.
 def onLeftEncode(pin):
@@ -32,11 +32,11 @@ def onRightEncode(pin):
     if (len(velArrayRight) > 5):
         velArrayRight = velArrayRight[1:6]
 
-def initEncoders():
-    while True:
-        time.sleep(0.25)
-        resetTempCounts()
-        tempStartTime = time.time()
+#def initEncoders():
+#    while True:
+#        time.sleep(0.25)
+#        resetTempCounts()
+#        tempStartTime = time.time()
 
 def resetCounts():
     rightTicks = 0
@@ -55,16 +55,16 @@ def getSpeeds():
     leftLength = len(velArrayLeft)
     rightLength = len(velArrayRight)
     return(
-    (velArrayLeft[1][leftLength - 1] - velArrayLeft[1][leftLength - 2]) / (velArrayLeft[0][leftLength - 1] - velArrayLeft[0][leftLength - 2])),
-    (velArrayRight[1][rightLength - 1] - velArrayRight[1][rightLength - 2]) / (velArrayRight[0][rightLength - 1] - velArrayRight[0][rightLength - 2])))
+    (velArrayLeft[1][leftLength - 1] - velArrayLeft[1][leftLength - 2]) / (velArrayLeft[0][leftLength - 1] - velArrayLeft[0][leftLength - 2]),
+    (velArrayRight[1][rightLength - 1] - velArrayRight[1][rightLength - 2]) / (velArrayRight[0][rightLength - 1] - velArrayRight[0][rightLength - 2]))
     
 
 
 def getElapsedTime():
     return time.time() - startTime
 
-while True:
-    time.sleep(0.25)
-    resetCounts()
-    tempStartTime = time.time()
+#while True:
+#    time.sleep(0.25)
+#    resetCounts()
+#    tempStartTime = time.time()
 

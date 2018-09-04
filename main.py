@@ -1,7 +1,7 @@
 # This program demonstrates usage of the digital encoders.
 # After executing the program, manually spin the wheels and observe the output.
 # See https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/ for more details.
-import "helperFiles/encoders.py"
+import encoders
 import time
 import RPi.GPIO as GPIO
 import signal
@@ -28,9 +28,9 @@ GPIO.setup(LENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(RENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # Attach a rising edge interrupt to the encoder pins
-GPIO.add_event_detect(LENCODER, GPIO.RISING, onLeftEncode)
-GPIO.add_event_detect(RENCODER, GPIO.RISING, onRightEncode)
+GPIO.add_event_detect(LENCODER, GPIO.RISING, encoders.onLeftEncode)
+GPIO.add_event_detect(RENCODER, GPIO.RISING, encoders.onRightEncode)
 
-while true:
+while True:
     print("running")
     time.sleep(1)
