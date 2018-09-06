@@ -73,8 +73,9 @@ class Encoders(object):
             for i in velArrayRight:
                 totalTimeRight += velArrayRight[0][i]
                 totalTicksRight += velArrayRight[1][i]
-            return (totalTicksLeft / totalTimeLeft / 32, totalTicksRight)
-        else return (0, 0)
+            return (totalTicksLeft / totalTimeLeft / 32, totalTicksRight / totalTimeRight / 32)
+        else:
+            return (0, 0)
 
     def getElapsedTime(self):
         return time.time() - startTime

@@ -6,6 +6,9 @@ import time
 import RPi.GPIO as GPIO
 import signal
 
+#objects for servos, encoders, sensors, and camera
+enc = encoders.encoders("ticky")
+
 # Pins that the encoders are connected to
 LENCODER = 17
 RENCODER = 18
@@ -28,10 +31,9 @@ GPIO.setup(LENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(RENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # Attach a rising edge interrupt to the encoder pins
-GPIO.add_event_detect(LENCODER, GPIO.RISING, encoders.onLeftEncode)
-GPIO.add_event_detect(RENCODER, GPIO.RISING, encoders.onRightEncode)
+GPIO.add_event_detect(LENCODER, GPIO.RISING, enc.onLeftEncode)
+GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 
-encoders.initEncoders
 while True:
     print("running")
     time.sleep(1)
