@@ -58,6 +58,7 @@ class Encoders(object):
 
     def getSpeeds(self):
         totalTime = self.getElapsedTime()
+        moving = self.isSpeedZero()
         #pprint(self.velArrayLeft)
         #pprint(self.velArrayRight)
         leftLength = len(self.velArrayLeft)
@@ -78,9 +79,27 @@ class Encoders(object):
                 self.totalTimeRight += time
                 self.totalTicksRight += ticks
                 #print(val)
-            return (self.totalTicksLeft / totalTime / 32, self.totalTicksRight / totalTime / 32)
+            return (self.totalTicksLeft / totalTime / 32 * moving[0], self.totalTicksRight / totalTime / 32 * moving[1])
         else:
             return (0, 0)
 
     def getElapsedTime(self):
         return time.time() - self.startTime
+    def isSpeedZero(self): #returns 0 for stopped, 1 for moving as a tuple (left, right)
+        rightMoving = 1
+        leftMoving = 1
+        if (len(self.velArrayLeft) > 0):
+            timeSinceLeft = time.time() - self.velArrayLeft[len(self.velArrayLeft) - 1][0]
+        else:
+            timeSinceLeft = 0
+        if (len(self.velArrayRight) > 0):
+            timeSinceRight = time.time() - self.velArrayRight[len(self.velArrayRight) - 1][0]
+        else:
+            timeSinceRight = 0
+        print((timeSinceLeft, timeSinceRight))
+            
+        if timeSinceRight > 1.5:
+            rightMoving = 0
+        if timeSinceLeft > 1.5:
+            leftMoving = 0
+        return (leftMoving, rightMoving)
