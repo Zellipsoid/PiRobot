@@ -19,8 +19,8 @@ class Encoders(object):
     def __init__(self):
         velArrayRight = []
         velArrayLeft = []
-        rightTicks = 0
-        leftTicks = 0
+        global rightTicks = 0
+        global leftTicks = 0
         tempRightTicks = 0
         tempLeftTicks = 0
         startTime = time.time()
@@ -28,7 +28,7 @@ class Encoders(object):
     # This function is called when the left encoder detects a rising edge signal.
     def onLeftEncode(self, pin):
         print("Left encoder ticked!")
-        leftTicks += 1
+        global leftTicks += 1
         tempLeftTicks += 1
         velArrayLeft.append((time.time(), leftTicks))
         if (len(velArrayLeft) > 24):
@@ -37,7 +37,7 @@ class Encoders(object):
     # This function is called when the right encoder detects a rising edge signal.
     def onRightEncode(self, pin):
         print("Right encoder ticked!")
-        rightTicks += 1
+        global rightTicks += 1
         tempRightTicks += 1
         velArrayRight.append((time.time(), rightTicks))
         if (len(velArrayRight) > 24):
