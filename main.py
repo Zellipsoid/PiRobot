@@ -7,7 +7,7 @@ import RPi.GPIO as GPIO
 import signal
 
 #objects for servos, encoders, sensors, and camera
-enc = encoders.encoders("ticky")
+enc = encoders.__init__("ticky")
 
 # Pins that the encoders are connected to
 LENCODER = 17
