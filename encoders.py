@@ -13,11 +13,12 @@ class Encoders(object):
         self.rightTicks = 0
         self.leftTicks = 0
         self.startTime = time.time()
-        self.speedRecord = 10
+        self.speedRecord = 2 #number of values to record in record of speed. Min val is 2. Bigger values are less instantaneous but more reliable.
+        self.notMovingTimeout = 1 # time in s before declared as not moving if no encoders ticked. The smaller the value, the less accurate but the higher the response time.
 
     # This function is called when the left encoder detects a rising edge signal.
     def onLeftEncode(self, pin):
-        print("Left encoder ticked!")
+        #print("Left encoder ticked!")
         self.leftTicks += 1
         self.velArrayLeft.append((time.time(), self.leftTicks))
         if (len(self.velArrayLeft) > self.speedRecord):
@@ -25,7 +26,7 @@ class Encoders(object):
 
     # This function is called when the right encoder detects a rising edge signal.
     def onRightEncode(self, pin):
-        print("Right encoder ticked!")
+        #print("Right encoder ticked!")
         self.rightTicks += 1
         self.velArrayRight.append((time.time(), self.rightTicks))
         if (len(self.velArrayRight) > self.speedRecord):
@@ -62,10 +63,10 @@ class Encoders(object):
             #     self.totalTimeRight += time
             #     self.totalTicksRight += ticks
             #     #print(val)
-            speedLeft = (velArrayLeft[1][leftLength] - velArrayLeft[1][0]) / (velArrayLeft[0][leftLength] - velArrayLeft[0][0])
-            speedRight = (velArrayRight[1][rightLength] - velArrayRight[1][0]) / (velArrayRight[0][rightLength] - velArrayRight[0][0])
+            speedLeft = (self.velArrayLeft[leftLength - 1][1] - self.velArrayLeft[0][1]) / (self.velArrayLeft[leftLength - 1][0] - self.velArrayLeft[0][0])
+            speedRight = (self.velArrayRight[rightLength - 1][1] - self.velArrayRight[0][1]) / (self.velArrayRight[rightLength - 1][0] - self.velArrayRight[0][0])
             # return (self.totalTicksLeft / totalTime / 32 * moving[0], self.totalTicksRight / totalTime / 32 * moving[1])
-            return (speedLeft * moving[0], speedRight * moving[1])
+            return (speedLeft / 32 * moving[0], speedRight / 32 * moving[1])
         else:
             return (0, 0)
 
@@ -82,10 +83,10 @@ class Encoders(object):
             timeSinceRight = time.time() - self.velArrayRight[len(self.velArrayRight) - 1][0]
         else:
             timeSinceRight = 0
-        print((timeSinceLeft, timeSinceRight))
+        #print((timeSinceLeft, timeSinceRight))
             
-        if timeSinceRight > 1.5:
+        if timeSinceRight > self.notMovingTimeout:
             rightMoving = 0
-        if timeSinceLeft > 1.5:
+        if timeSinceLeft > self.notMovingTimeout:
             leftMoving = 0
         return (leftMoving, rightMoving)

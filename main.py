@@ -35,7 +35,7 @@ GPIO.add_event_detect(LENCODER, GPIO.RISING, enc.onLeftEncode)
 GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 
 while True:
-    print("running")
+    #print("running")
     time.sleep(1)
     speedTuple = enc.getSpeeds()
     print(str((speedTuple[0] + speedTuple[1]) / 2) + " RPS")
