@@ -16,11 +16,13 @@ RENCODER = 18
 
 def ctrlC(signum, frame):
     print("Exiting")
-    pwm.set_pwm(LSERVO, 0, 0)
-    pwm.set_pwm(RSERVO, 0, 0)
+    serv.stopServos()
+    #pwm.set_pwm(LSERVO, 0, 0);
+    #pwm.set_pwm(RSERVO, 0, 0);
     GPIO.cleanup()
     exit()
 
+#pwm = Adafruit_PCA9685.PCA9685()
 # Attach the Ctrl+C signal interrupt
 signal.signal(signal.SIGINT, ctrlC)
     
@@ -38,16 +40,17 @@ GPIO.add_event_detect(LENCODER, GPIO.RISING, enc.onLeftEncode)
 GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 
 while True:
+    #time.sleep(1)
     #print("running")
     time.sleep(3)
     print("setting speed to max")
-    serv.setSpeed(1.7, 1.7)
+    serv.setSpeeds(1.6, 1.6)
     time.sleep(3)
     print("setting speed to max reverse")
-    serv.setSpeed(1.3, 1.3)
+    serv.setSpeeds(1.4, 1.4)
     time.sleep(3)
     print("stopping")
-    serv.setSpeed(1.5, 1.5)
+    serv.setSpeeds(1.5, 1.5)
     # speedTuple = enc.getSpeeds()
     # print(str((speedTuple[0] + speedTuple[1]) / 2) + " RPS")
     #print(enc.getElapsedTime())
