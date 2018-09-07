@@ -3,20 +3,16 @@ import Adafruit_PCA9685
 import signal
 import math
 
-def ctrlC(signum, frame):
-    print("Exiting")
-    
-    # Stop the servos
-    pwm.set_pwm(LSERVO, 0, 0)
-    pwm.set_pwm(RSERVO, 0, 0)
-    
-    exit()
+class Servos(object):
 
-def setSpeeds():
+    # def __init__(self):
 
+    def setSpeeds(left, right):
+        pwm.set_pwm(LSERVO, 0, math.floor(left / 20 * 4096))
+        pwm.set_pwm(RSERVO, 0, math.floor((3 - right) / 20 * 4096))
 
-def calibrateSpeeds():
+# def calibrateSpeeds():
 
-def setSpeedsRPS(rpsLeft, rpsRight):
+# def setSpeedsRPS(rpsLeft, rpsRight):
 
-def setSpeedsvw(v, w):
+# def setSpeedsvw(v, w):

@@ -2,19 +2,22 @@
 # After executing the program, manually spin the wheels and observe the output.
 # See https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/ for more details.
 import encoders
+import servos
 import time
 import RPi.GPIO as GPIO
 import signal
 
 #objects for servos, encoders, sensors, and camera
 enc = encoders.Encoders()
-
+serv = servos.Servos()
 # Pins that the encoders are connected to
 LENCODER = 17
 RENCODER = 18
 
 def ctrlC(signum, frame):
     print("Exiting")
+    pwm.set_pwm(LSERVO, 0, 0)
+    pwm.set_pwm(RSERVO, 0, 0)
     GPIO.cleanup()
     exit()
 
@@ -36,7 +39,15 @@ GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 
 while True:
     #print("running")
-    time.sleep(1)
-    speedTuple = enc.getSpeeds()
-    print(str((speedTuple[0] + speedTuple[1]) / 2) + " RPS")
+    time.sleep(3)
+    print("setting speed to max")
+    serv.setSpeed(1.7, 1.7)
+    time.sleep(3)
+    print("setting speed to max reverse")
+    serv.setSpeed(1.3, 1.3)
+    time.sleep(3)
+    print("stopping")
+    serv.setSpeed(1.5, 1.5)
+    # speedTuple = enc.getSpeeds()
+    # print(str((speedTuple[0] + speedTuple[1]) / 2) + " RPS")
     #print(enc.getElapsedTime())
