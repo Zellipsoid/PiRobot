@@ -12,15 +12,14 @@ class Servos(object):
         self.LSERVO = 0
         self.RSERVO = 1
     def stopServos(self):
-        self.pwm.set_pwm(self.LSERVO, 0, 0);
-        self.pwm.set_pwm(self.RSERVO, 0, 0);
+        self.pwm.set_pwm(self.LSERVO, 0, 0)
+        self.pwm.set_pwm(self.RSERVO, 0, 0)
     def setSpeeds(self, left, right):
-        print("left: " + str(left))
-        print("right: " + str(right))
+        # print("left: " + str(left))
+        # print("right: " + str(right))
         self.pwm.set_pwm(self.LSERVO, 0, math.floor(left / 20 * 4096))
         self.pwm.set_pwm(self.RSERVO, 0, math.floor((3 - right) / 20 * 4096))
 
-# def calibrateSpeeds():
 
 # def setSpeedsRPS(rpsLeft, rpsRight):
 
