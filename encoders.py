@@ -67,6 +67,14 @@ class Encoders(object):
             speedRight = (self.velArrayRight[rightLength - 1][1] - self.velArrayRight[0][1]) / (self.velArrayRight[rightLength - 1][0] - self.velArrayRight[0][0])
             # return (self.totalTicksLeft / totalTime / 32 * moving[0], self.totalTicksRight / totalTime / 32 * moving[1])
             return (speedLeft / 32 * moving[0], speedRight / 32 * moving[1])
+        #elif rightLength > 0 and totalTime > 0:
+            #speedRight = (self.velArrayRight[rightLength - 1][1] - self.velArrayRight[0][1]) / (self.velArrayRight[rightLength - 1][0] - self.velArrayRight[0][0])
+            #return (0, speedRight / 32 * moving[1])
+        #elif leftLength > 0 and totalTime > 0:
+            #speedLeft = (self.velArrayLeft[leftLength - 1][1] - self.velArrayLeft[0][1]) / (self.velArrayLeft[leftLength - 1][0] - self.velArrayLeft[0][0])
+            #return (speedLeft / 32 * moving[0], 0)
+        #else:
+            #return (0, 0)
         else:
             return (0, 0)
 
