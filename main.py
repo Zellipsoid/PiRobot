@@ -28,7 +28,7 @@ def calibrateSpeeds(interval):
         serv.setSpeeds(freq, freq)
         time.sleep(1)
         speedTuple2 = enc.getSpeeds()
-        print(str((speedTuple2[0] + speedTuple2[1]) / 2) + " RPS")
+        f.write(str((speedTuple2[0] + speedTuple2[1]) / 2) + " RPS")
         freq += interval
 
 
@@ -55,6 +55,9 @@ f.closer()
 while True:
     #time.sleep(1)
     #print("running")
+    #time.sleep(3)
+    #print("testing right wheel only")
+    #serv.setSpeeds(0, 100)
     time.sleep(3)
     print("setting speed to max")
     serv.setSpeeds(1.6, 1.6)
@@ -64,6 +67,6 @@ while True:
     time.sleep(3)
     print("stopping")
     serv.setSpeeds(1.5, 1.5)
-    # speedTuple = enc.getSpeeds()
-    # print(str((speedTuple[0] + speedTuple[1]) / 2) + " RPS")
+    #speedTuple = enc.getSpeeds()
+    #print(str((speedTuple[0] + speedTuple[1]) / 2) + " RPS")
     #print(enc.getElapsedTime())
