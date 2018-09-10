@@ -22,7 +22,15 @@ class Servos(object):
             right = 1.6
         self.pwm.set_pwm(self.LSERVO, 0, math.floor(left / 20 * 4096))
         self.pwm.set_pwm(self.RSERVO, 0, math.floor((3 - right) / 20 * 4096))
-
+    #def setSpeedsIPS(self, left, right):
+        # print("left: " + str(left))
+        # print("right: " + str(right))
+        #if left == 0 and right == 0:
+             #left = 1.5
+             #right = 1.5
+        #elif 
+        #self.pwm.set_pwm(self.LSERVO, 0, math.floor(left / 20 * 4096))
+        #self.pwm.set_pwm(self.RSERVO, 0, math.floor((3 - right) / 20 * 4096))
 
 # def setSpeedsRPS(rpsLeft, rpsRight):
 
