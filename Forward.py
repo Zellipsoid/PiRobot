@@ -33,19 +33,23 @@ GPIO.setup(RENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(LENCODER, GPIO.RISING, enc.onLeftEncode)
 GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 
-def getElapsedTime(self):
-   return time.time() - startTime
-
-startTime = time.time()
-
 inches = input("Please input X (in inches) ")
 seconds = input("Please input Y ( in seconds) ")
 speed = inches/seconds
 
-self.setSpeedsIPS(speed, speed)
+serv.setSpeedsIPS(speed, speed)
 
-if getElapsedTime() >= Y:
-     self.setSpeedsIPS(0, 0)
+speedTuple = enc.getSpeeds()
+timeSince = enc.getElapsedTime()
+
+distance1 = (speedTuple[0] * 8.09)/timeSince #calculates distance traveled based on RPS to IPS divided by time elapsed
+distance2 = (speedTuple[1] * 8.09)/timeSince 
+
+if distance1 >= inches or distance2 >= inches:
+     serv.setSpeedsIPS(0,0)
+        
+if timeSince > seconds:
+    serv.setSpeedsIPS(0,0)
 
 while True:
     time.sleep(1)
