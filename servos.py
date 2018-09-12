@@ -34,7 +34,7 @@ class Servos(object):
         #self.pwm.set_pwm(self.LSERVO, 0, math.floor(left / 20 * 4096))
         #self.pwm.set_pwm(self.RSERVO, 0, math.floor((3 - right) / 20 * 4096))
 
-# def setSpeedsRPS(rpsLeft, rpsRight):
+    # def setSpeedsRPS(rpsLeft, rpsRight):
         # print("rpsLeft: " + str(rpsLeft))
         # print("rpsRight: " + str(rpsRight))
         #if rpsLeft == 0 and rpsRight == 0:
@@ -46,7 +46,7 @@ class Servos(object):
         #self.pwm.set_pwm(self.LSERVO, 0, math.floor(left / 20 * 4096))
         #self.pwm.set_pwm(self.RSERVO, 0, math.floor((3 - right) / 20 * 4096))
 
-# def setSpeedsvw(v, w):
+   # def setSpeedsvw(v, w):
         # print("v: " + str(v))
         # print("w: " + str(w))
         #if v == 0 and w == 0:
