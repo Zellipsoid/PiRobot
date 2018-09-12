@@ -18,7 +18,7 @@ class Encoders(object):
 
     # This function is called when the left encoder detects a rising edge signal.
     def onLeftEncode(self, pin):
-        #print("Left encoder ticked!")
+        #print(self.getCounts() + "left, right ticks")
         self.leftTicks += 1
         self.velArrayLeft.append((time.time(), self.leftTicks))
         if (len(self.velArrayLeft) > self.speedRecord):
@@ -26,7 +26,7 @@ class Encoders(object):
 
     # This function is called when the right encoder detects a rising edge signal.
     def onRightEncode(self, pin):
-        #print("Right encoder ticked!")
+        #print(self.getCounts() + "left, right ticks")
         self.rightTicks += 1
         self.velArrayRight.append((time.time(), self.rightTicks))
         if (len(self.velArrayRight) > self.speedRecord):
