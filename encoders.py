@@ -35,6 +35,7 @@ class Encoders(object):
     def resetCounts(self):
         self.rightTicks = 0
         self.leftTicks = 0
+        self.startTime = time.time() #reseting the ticks also resets the clock time
 
     def getCounts(self):
         return (self.leftTicks, self.rightTicks)
@@ -49,6 +50,8 @@ class Encoders(object):
         # return(
         # (velArrayLeft[1][leftLength - 1] - velArrayLeft[1][leftLength - 2]) / (velArrayLeft[0][leftLength - 1] - velArrayLeft[0][leftLength - 2]),
         # (velArrayRight[1][rightLength - 1] - velArrayRight[1][rightLength - 2]) / (velArrayRight[0][rightLength - 1] - velArrayRight[0][rightLength - 2]))
+        if moving[0] == 0 and moving[1] == 0:
+            self.resetCounts
         if rightLength > 0 and leftLength > 0 and totalTime > 0:
             # I think all of this was wrong
             # self.totalTimeLeft = 0
@@ -67,6 +70,7 @@ class Encoders(object):
             speedRight = (self.velArrayRight[rightLength - 1][1] - self.velArrayRight[0][1]) / (self.velArrayRight[rightLength - 1][0] - self.velArrayRight[0][0])
             # return (self.totalTicksLeft / totalTime / 32 * moving[0], self.totalTicksRight / totalTime / 32 * moving[1])
             return (speedLeft / 32 * moving[0], speedRight / 32 * moving[1])
+        #are these necessary if one wheel is at zero?
         #elif rightLength > 0 and totalTime > 0:
             #speedRight = (self.velArrayRight[rightLength - 1][1] - self.velArrayRight[0][1]) / (self.velArrayRight[rightLength - 1][0] - self.velArrayRight[0][0])
             #return (0, speedRight / 32 * moving[1])
