@@ -34,11 +34,6 @@ GPIO.setup(RENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(LENCODER, GPIO.RISING, enc.onLeftEncode)
 GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 
-def getElapsedTime(self):
-   return time.time() - startTime
-
-startTime = time.time()
-
 radius1 = input("Please input R1 (in inches): ")
 radius2 = input("Please input R2 (in inches): ")
 seconds = input("Please input Y (in seconds): ")
@@ -50,29 +45,28 @@ totalSpeed = (circumR1 + circumR2)/seconds # consistent speed in inches per seco
 angVel1 = totalSpeed/radius1 #angular velocity of R1
 angVel2 = totalSpeed/radius2 #angular velocity of R2
 
-self.setSpeedsvw(totalSpeed, angVel1) #how to slow down one wheel to get right size semicirle?
+serv.setSpeedsvw(totalSpeed, angVel1) #how to slow down one wheel to get right size semicirle?
 
 speedTuple = enc.getSpeeds()
 DistanceWheel1 = (speedTuple[0] * 8.09)/(seconds/2) 
 # revolutions per second times inches per revolution divide by half of the total time
 
-
 if DistanceWheel1 >= circumR1:
-     self.setSpeedsIPS(0, 0)
+     serv.setSpeedsvw(0, 0)
      
 continue = input("Press y to continue, or ctrl-C to cancel: ")
 
 while continue != 'y':
   None
   
-self.setSpeedsvw(totalSpeed, angVel2) #how to slow down one wheel to get right size semicirle?
+serv.setSpeedsvw(totalSpeed, angVel2) #how to slow down one wheel to get right size semicirle?
 
 speedTuple = enc.getSpeeds()
 DistanceWheel2 = (speedTuple[1] * 8.09)/(seconds/2) 
 # revolutions per second times inches per revolution divide by half of the total time
 
 if DistanceWheel2 >= circumR2:
-     self.setSpeedsIPS(0, 0)
+     serv.setSpeedsvw(0, 0)
      
 print("Task complete!")
 
