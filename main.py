@@ -68,5 +68,6 @@ while True:
     print("stopping")
     serv.setSpeeds(1.5, 1.5)
     #speedTuple = enc.getSpeeds()
-    #print(str((speedTuple[0] + speedTuple[1]) / 2) + " RPS")
+    #print(str(speedTuple[0] + "left RPS")
+    #print(str(speedTuple[1] + "right RPS")
     #print(enc.getElapsedTime())
