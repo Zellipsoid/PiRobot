@@ -21,15 +21,15 @@ def ctrlC(signum, frame):
     GPIO.cleanup()
     exit()
 
-def calibrateSpeeds(interval):
-    freq = 1.3
-    y = 1.3
-    while freq <= 1.7 and y <= 1.7:
-        serv.setSpeeds(freq, freq)
-        time.sleep(1)
-        speedTuple2 = enc.getSpeeds()
-        f.write(str((speedTuple2[0] + speedTuple2[1]) / 2) + " RPS")
-        freq += interval
+#def calibrateSpeeds(interval):
+    #freq = 1.3
+    #y = 1.3
+    #while freq <= 1.7 and y <= 1.7:
+        #serv.setSpeeds(freq, freq)
+        #time.sleep(1)
+        #speedTuple2 = enc.getSpeeds()
+        #f.write(str((speedTuple2[0] + speedTuple2[1]) / 2) + " RPS")
+        #freq += interval
 
 
 # Attach the Ctrl+C signal interrupt
@@ -48,9 +48,9 @@ GPIO.setup(RENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(LENCODER, GPIO.RISING, enc.onLeftEncode)
 GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 
-f = open("data.txt", "w")
-calibrateSpeeds(.1)
-f.closer()
+#f = open("data.txt", "w")
+#calibrateSpeeds(.1)
+#f.closer()
 
 while True:
     #time.sleep(1)
