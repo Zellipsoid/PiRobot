@@ -47,7 +47,10 @@ circumR1 = (2 * math.pi * radius1)/2 # distance to travel for R1's path in inche
 circumR2 = (2 * math.pi * radius2)/2 # distance to travel for R2's path in inches
 totalSpeed = (circumR1 + circumR2)/seconds # consistent speed in inches per second
 
-self.setSpeedsIPS(totalSpeed, totalSpeed/2) #how to slow down one wheel to get right size semicirle?
+angVel1 = totalSpeed/radius1 #angular velocity of R1
+angVel2 = totalSpeed/radius2 #angular velocity of R2
+
+self.setSpeedsvw(totalSpeed, angVel1) #how to slow down one wheel to get right size semicirle?
 
 speedTuple = enc.getSpeeds()
 DistanceWheel1 = (speedTuple[0] * 8.09)/(seconds/2) 
@@ -62,7 +65,7 @@ continue = input("Press y to continue, or ctrl-C to cancel: ")
 while continue != 'y':
   None
   
-self.setSpeedsIPS(totalSpeed/2, totalSpeed) #how to slow down one wheel to get right size semicirle?
+self.setSpeedsvw(totalSpeed, angVel2) #how to slow down one wheel to get right size semicirle?
 
 speedTuple = enc.getSpeeds()
 DistanceWheel2 = (speedTuple[1] * 8.09)/(seconds/2) 
@@ -74,4 +77,4 @@ if DistanceWheel2 >= circumR2:
 print("Task complete!")
 
 while True:
-    time.sleep(1)
+    time.sleep(5)
