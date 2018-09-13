@@ -192,6 +192,6 @@ class Encoders(object):
         calServ.stopServos()
         #write to file
         with open('calibration.json', 'w') as writeFile:
-            json.dump(calibrationData, writeFile)
+            json.dump(calibrationData, writeFile, indent=4, separators=(',',': '), sort_keys=True)
         self.calibrating = False
 
