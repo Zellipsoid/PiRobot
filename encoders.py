@@ -23,6 +23,7 @@ class Encoders(object):
         self.wheelTicksRight = 0
         self.calibrationArrayRight = [] #these two arrays hold values for speed that will be averages for each speed increment and put into the json
         self.calibrationArrayLeft = []
+        self.accuracy = 10 #will record speed this number of time and average result
 
     # This function is called when the left encoder detects a rising edge signal.
     def onLeftEncode(self, pin):
@@ -124,7 +125,7 @@ class Encoders(object):
             print('Collecting data for (' + str(leftStage) + ', ' + str(rightStage) + ')...')
             calServ.setSpeeds(leftStage, rightStage)
             print('Waiting for ticks...')
-            while(self.wheelTicksLeft < 5 and self.wheelTicksRight < 5): #while loop is just to wait for more ticks
+            while(self.wheelTicksLeft < self.accuracy + 1 and self.wheelTicksRight < self.accuracy + 1): #while loop is just to wait for more ticks
                 #speed = self.getSpeeds()
                 #if speed[0] == 0 or speed[1] == 0 and rightStage > 1.4 and leftStage < 1.6:
                     #rightStage = 1.5
@@ -132,8 +133,8 @@ class Encoders(object):
                     #break
                 pass
             print('Got the ticks!')
-            averageSpeedLeft = sum(self.calibrationArrayLeft[-4:]) / 4 #averages last 4 elements of left array, left out first because it may not be accurate
-            averageSpeedRight = sum(self.calibrationArrayRight[-4:]) / 4 #averages last 4 elements of right array
+            averageSpeedLeft = sum(self.calibrationArrayLeft[-self.accuracy:]) / self.accuracy #averages last x elements of left array, left out first because it may not be accurate
+            averageSpeedRight = sum(self.calibrationArrayRight[-self.accuracy:]) / self.accuracy #averages last x elements of right array
             calibrationData['left'][averageSpeedLeft] = leftStage
             calibrationData['right'][averageSpeedRight] = rightStage
             print('Average speed left: ' + str(averageSpeedLeft))
@@ -160,7 +161,7 @@ class Encoders(object):
             print('Collecting data for (' + str(leftStage) + ', ' + str(rightStage) + ')(1.5, 1.5)...')
             calServ.setSpeeds(leftStage, rightStage)
             print('Waiting for ticks...')
-            while(self.wheelTicksLeft < 5 and self.wheelTicksRight < 5): #while loop is just to wait for more ticks
+            while(self.wheelTicksLeft < self.accuracy + 1 and self.wheelTicksRight < self.accuracy + 1): #while loop is just to wait for more ticks
                 #speed = self.getSpeeds()
                 #if speed[0] == 0 or speed[1] == 0 and rightStage > 1.4 and leftStage < 1.6:
                     #rightStage = 1.5
@@ -168,8 +169,8 @@ class Encoders(object):
                     #break
                 pass
             print('Got the ticks!')
-            averageSpeedLeft = sum(self.calibrationArrayLeft[-4:]) / 4 #averages last 4 elements of left array, left out first because it may not be accurate
-            averageSpeedRight = sum(self.calibrationArrayRight[-4:]) / 4 #averages last 4 elements of right array
+            averageSpeedLeft = sum(self.calibrationArrayLeft[-self.accuracy:]) / self.accuracy #averages last x elements of left array, left out first because it may not be accurate
+            averageSpeedRight = sum(self.calibrationArrayRight[-self.accuracy:]) / self.accuracy #averages last x elements of right array
             calibrationData['left'][averageSpeedLeft] = leftStage
             calibrationData['right'][averageSpeedRight] = rightStage
             print('Average speed left: ' + str(averageSpeedLeft))
