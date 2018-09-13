@@ -34,7 +34,7 @@ GPIO.setup(LENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(RENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # Attach a rising edge interrupt to the encoder pins
-GPIO.add_event_detect(LENCODER, GPIO.RISING, enc.onLeftEncode and serv.leftTick)
-GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode and serv.rightTick)
+GPIO.add_event_detect(LENCODER, GPIO.RISING, enc.onLeftEncode) #and serv.leftTick)
+GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode) #and serv.rightTick)
 
-serv.calibrateSpeeds()
+enc.calibrateSpeeds()
