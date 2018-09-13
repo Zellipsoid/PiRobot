@@ -144,10 +144,10 @@ class Encoders(object):
             self.calibrationArrayRight = []
             self.wheelTicksLeft = 0
             self.wheelTicksRight = 0
-            if (leftStage > 1.6 and rightStage < 1.4):
-                rightStage += 0.01
-                leftStage -= 0.01
-            elif(leftStage > 1.506 and rightStage < 1.494): #would be miserable going slower than this
+            # if (leftStage > 1.6 and rightStage < 1.4):
+            #     rightStage += 0.01
+            #     leftStage -= 0.01
+            if(leftStage > 1.52 and rightStage < 1.48): #would be miserable going slower than this
                 rightStage += 0.005
                 leftStage -= 0.005
             else:
@@ -180,10 +180,10 @@ class Encoders(object):
             self.calibrationArrayRight = []
             self.wheelTicksLeft = 0
             self.wheelTicksRight = 0
-            if (leftStage < 1.4 and rightStage > 1.6):
-                rightStage -= 0.01
-                leftStage += 0.01
-            elif(leftStage < 1.48 and rightStage > 1.52): #would be miserable going slower than this
+            # if (leftStage < 1.4 and rightStage > 1.6):
+            #     rightStage -= 0.01
+            #     leftStage += 0.01
+            if(leftStage < 1.48 and rightStage > 1.52): #would be miserable going slower than this
                 rightStage -= 0.005
                 leftStage += 0.005
             else:
