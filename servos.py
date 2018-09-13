@@ -13,7 +13,7 @@ class Servos(object):
         self.pwm.set_pwm_freq(50)
         self.LSERVO = 0
         self.RSERVO = 1
-        self.calibrating = false
+        self.calibrating = False
         self.wheelTicksLeft = 0
         self.wheelTicksRight = 0
         self.calibrationArrayRight = [] #these two arrays hold values for speed that will be averages for each speed increment and put into the json
@@ -31,17 +31,18 @@ class Servos(object):
         self.pwm.set_pwm(self.RSERVO, 0, math.floor((3 - right) / 20 * 4096))
 
     #all of this is for calibration
-    def leftTick(self):
+    def leftTick(self, pin):
         if (self.calibrating):
             self.wheelTicksLeft += 1
             self.calibrationArrayLeft.append(self.encForCal.getSpeeds()[0]) #append current left speed to array
 
-    def rightTick(self):
+    def rightTick(self, pin):
         if (self.calibrating):
             self.wheelTicksRight += 1
             self.calibrationArrayRight.append(self.encForCal.getSpeeds()[1]) #append current right speed to array
 
     def calibrateSpeeds(self):
+        self.calibrating = True
         print('Starting calibration...')
         calibrationData = {} #dictionary containing calibration data
         calibrationData['left'] = {}
@@ -51,13 +52,15 @@ class Servos(object):
         print('CCW stage beginning...')
         while (rightStage < 1.5 and leftStage > 1.5):
             print('Collecting data for (' + str(leftStage) + ', ' + str(rightStage) + ')...')
-            encForCal.setSpeeds(leftStage, rightStage)
+            self.setSpeeds(leftStage, rightStage)
+            print('Waiting for ticks...')
             while(self.wheelTicksLeft < 5 and self.wheelTicksRight < 5): #while loop is just to wait for more ticks
                 pass
+            print('Got the ticks!')
             averageSpeedLeft = sum(self.calibrationArrayLeft[-4:]) / 4 #averages last 4 elements of left array, left out first because it may not be accurate
             averageSpeedRight = sum(self.calibrationArrayRight[-4:]) / 4 #averages last 4 elements of right array
-            calibrationData['left'].append(averageSpeedLeft:leftStage)
-            calibrationData['right'].append(averageSpeedRight:rightStage)
+            calibrationData['left'][averageSpeedLeft] = leftStage
+            calibrationData['right'][averageSpeedRight] = rightStage
             print('Average speed left: ' + str(averageSpeedLeft))
             print('Average speed right: ' + str(averageSpeedRight))
             #empty everything and reset for next stage
@@ -68,7 +71,7 @@ class Servos(object):
             if (leftStage > 1.6 and rightStage < 1.4):
                 rightStage += 0.01
                 leftStage -= 0.01
-            elif(leftStage > 1.505 and rightStage < 1.495): #would be miserable going slower than this
+            elif(leftStage > 1.506 and rightStage < 1.494): #would be miserable going slower than this
                 rightStage += 0.005
                 leftStage -= 0.005
             else:
@@ -80,13 +83,15 @@ class Servos(object):
         leftStage = 1.2 #PWM freq for left
         while (rightStage > 1.5 and leftStage < 1.5):
             print('Collecting data for (' + str(leftStage) + ', ' + str(rightStage) + ')...')
-            encForCal.setSpeeds(leftStage, rightStage)
+            self.setSpeeds(leftStage, rightStage)
+            print('Waiting for ticks...')
             while(self.wheelTicksLeft < 5 and self.wheelTicksRight < 5): #while loop is just to wait for more ticks
                 pass
+            print('Got the ticks!')
             averageSpeedLeft = sum(self.calibrationArrayLeft[-4:]) / 4 #averages last 4 elements of left array, left out first because it may not be accurate
             averageSpeedRight = sum(self.calibrationArrayRight[-4:]) / 4 #averages last 4 elements of right array
-            calibrationData['left'].append(averageSpeedLeft:leftStage)
-            calibrationData['right'].append(averageSpeedRight:rightStage)
+            calibrationData['left'][averageSpeedLeft] = leftStage
+            calibrationData['right'][averageSpeedRight] = rightStage
             print('Average speed left: ' + str(averageSpeedLeft))
             print('Average speed right: ' + str(averageSpeedRight))
             #empty everything and reset for next stage
@@ -97,7 +102,7 @@ class Servos(object):
             if (leftStage < 1.4 and rightStage > 1.6):
                 rightStage -= 0.01
                 leftStage += 0.01
-            elif(leftStage < 1.495 and rightStage > 1.505): #would be miserable going slower than this
+            elif(leftStage < 1.494 and rightStage > 1.506): #would be miserable going slower than this
                 rightStage -= 0.005
                 leftStage += 0.005
             else:
@@ -106,6 +111,8 @@ class Servos(object):
         #write to file
         with open('calibration.json', 'w') as writeFile:
             json.dump(calibrationData, writeFile)
+        self.calibrating = False
+        self.setSpeeds(1.5, 1.5)
 
 
 
