@@ -34,6 +34,14 @@ class Servos(object):
             self.wheelTicksRight += 1
     def calibrateSpeeds(self):
         encForCal = encoders.Encoders()
+        calibrationData = {}
+        calibrationData['right'] = []
+        calibrationData['left'] = []
+        rightStage = 1.2
+        leftStage = 1.8
+        encForCal.setSpeeds(leftStage, rightStage)
+        while (rightStage <= 1.8 and leftStage > 1.2):
+            while()
 
 # def setSpeedsRPS(rpsLeft, rpsRight):
 
