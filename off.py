@@ -48,7 +48,5 @@ GPIO.setup(RENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(LENCODER, GPIO.RISING, enc.onLeftEncode)
 GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 
-serv.setSpeedsIPS(100, 100)
-while True:
-    time.sleep(1)
-    print(enc.getSpeeds())
+serv.setSpeeds(1.5, 1.5)
+  
