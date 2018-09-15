@@ -15,8 +15,10 @@ class Servos(object):
         self.pwm.set_pwm_freq(50)
         self.LSERVO = 0
         self.RSERVO = 1
-        self.calibrationDataLeft = []
-        self.calibrationDataRight = []
+        self.calibrationDataLeftRPS = []
+        self.calibrationDataRightRPS = []
+        self.calibrationDataLeftMS = []
+        self.calibrationDataRightMS = []
         self.loadJSON()
         #  = json.load(open('calibration.json', 'r'), object_pairs_hook=OrderedDict) #opens json as ordered dict
         # self.calibrationData['right'] = {float(k):v for k, v in self.calibrationData['right'].items()} #converts keys from strings to floats for right side
@@ -43,10 +45,11 @@ class Servos(object):
                     numberArray[0] = float(numberArray[0])
                     numberArray[1] = float(numberArray[1])
                     if (left):
-                        self.calibrationDataLeft.append(tuple(numberArray))
+                        self.calibrationDataLeftRPS.append(numberArray[0])
+                        self.calibrationDataLeftMS.append(numberArray[1])
                     if (right):
-                        self.calibrationDataRight.append(tuple(numberArray))
-                                                                                                                                        
+                        self.calibrationDataRightRPS.append(numberArray[0])
+                        self.calibrationDataRightMS.append(numberArray[1])                                                                                                                
 
     def stopServos(self):
         self.pwm.set_pwm(self.LSERVO, 0, 0)
@@ -77,15 +80,20 @@ class Servos(object):
         print(self.calibrationDataRight)
         
     def retrieveJSONSpeed(self, side, rps): #side is string
-        index = bisect.bisect_left(list(self.calibrationData[side].keys()), rps) #finds first index that has key larger than rps
-        value = next( i for i, v in enumerate(self.calibrationData[side]) if i == index ) # loads key for that index
-        valueMinusOne = next( i for i, v in enumerate(self.calibrationData[side]) if i == index - 1 ) #and the key for one lower
-        print(index)
-        if abs(rps - valueMinusOne) - abs(rps - value) >= 0: #checks which is closest to rps passed in
-            return next( v for i, v in enumerate(self.calibrationData[side]) if i == index) #returns value of next larger key
-        else:
-            return next( v for i, v in enumerate(self.calibrationData[side]) if i == index -1) #returns value for the key one lower
+        if side == "left":
+            index = bisect.bisect_left(self.calibrationDataLeftRPS, rps) #finds first index that has key larger than rps
+            if abs(rps - self.calibrationDataLeftRPS[index]) >= abs(rps - self.calibrationDataLeftRPS[index - 1]):
+                return self.calibrationDataLeftMS[index - 1]
+            else:
+                return self.calibrationDataLeftMS[index]
+        if side == "right":
+            index = bisect.bisect_left(self.calibrationDataRightRPS, rps) #finds first index that has key larger than rps
+            if abs(rps - self.calibrationDataRightRPS[index]) >= abs(rps - self.calibrationDataRightRPS[index - 1]):
+                return self.calibrationDataRightMS[index - 1]
+            else:
+                return self.calibrationDataRightMS[index]
 
 
         # return min(abs(rps - list(self.calibrationData[side].values())[index]), abs(rps - list(self.calibrationData[side].values())[index - 1]))
         
+ #finds first index that has key larger than rps

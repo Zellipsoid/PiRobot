@@ -52,6 +52,6 @@ GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 #calibrateSpeeds(.1)
 #f.closer()
 
-print(serv.printCalibrationData())
-#print(serv.retrieveJSONSpeed("right", 0.7))
+#print(serv.printCalibrationData())
+print(serv.retrieveJSONSpeed("left", 0.1))
 #testing dropbox sync
