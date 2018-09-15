@@ -63,13 +63,12 @@ class Servos(object):
 
     #all of this is for calibration    
 
-# def setSpeedsRPS(rpsLeft, rpsRight):
-        #self.pwm.set_pwm(self.LSERVO, 0, math.floor(left / 20 * 4096))
-        #self.pwm.set_pwm(self.RSERVO, 0, math.floor((3 - right) / 20 * 4096))
+    def setSpeedsRPS(self, rpsLeft, rpsRight):        
+        self.setSpeeds(self.retrieveJSONSpeed("left", rpsLeft), self.retrieveJSONSpeed("right", rpsRight))
+        
 
-# def setSpeedsIPS(ipsLeft, ipsRight):
-        #self.pwm.set_pwm(self.LSERVO, 0, math.floor(left / 20 * 4096))
-        #self.pwm.set_pwm(self.RSERVO, 0, math.floor((3 - right) / 20 * 4096))
+    def setSpeedsIPS(self, ipsLeft, ipsRight):
+        self.setSpeedsRPS(ipsLeft / (2.61 * math.pi), ipsRight / (2.61 * math.pi))
 
 # def setSpeedsvw(v, w):
         #self.pwm.set_pwm(self.LSERVO, 0, math.floor(left / 20 * 4096))
@@ -82,12 +81,16 @@ class Servos(object):
     def retrieveJSONSpeed(self, side, rps): #side is string
         if side == "left":
             index = bisect.bisect_left(self.calibrationDataLeftRPS, rps) #finds first index that has key larger than rps
+            if index == len(self.calibrationDataLeftRPS):
+                index -= 1
             if abs(rps - self.calibrationDataLeftRPS[index]) >= abs(rps - self.calibrationDataLeftRPS[index - 1]):
                 return self.calibrationDataLeftMS[index - 1]
             else:
                 return self.calibrationDataLeftMS[index]
         if side == "right":
             index = bisect.bisect_left(self.calibrationDataRightRPS, rps) #finds first index that has key larger than rps
+            if index == len(self.calibrationDataRightRPS):
+                index -= 1
             if abs(rps - self.calibrationDataRightRPS[index]) >= abs(rps - self.calibrationDataRightRPS[index - 1]):
                 return self.calibrationDataRightMS[index - 1]
             else:

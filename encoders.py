@@ -136,7 +136,7 @@ class Encoders(object):
             averageSpeedLeft = sum(self.calibrationArrayLeft[-self.accuracy:]) / self.accuracy #averages last x elements of left array, left out first because it may not be accurate
             averageSpeedRight = sum(self.calibrationArrayRight[-self.accuracy:]) / self.accuracy #averages last x elements of right array
             calibrationData['left'][averageSpeedLeft] = leftStage
-            calibrationData['right'][averageSpeedRight] = rightStage
+            calibrationData['right'][-averageSpeedRight] = rightStage
             print('Average speed left: ' + str(averageSpeedLeft))
             print('Average speed right: ' + str(averageSpeedRight))
             #empty everything and reset for next stage
@@ -171,7 +171,7 @@ class Encoders(object):
             print('Got the ticks!')
             averageSpeedLeft = sum(self.calibrationArrayLeft[-self.accuracy:]) / self.accuracy #averages last x elements of left array, left out first because it may not be accurate
             averageSpeedRight = sum(self.calibrationArrayRight[-self.accuracy:]) / self.accuracy #averages last x elements of right array
-            calibrationData['left'][averageSpeedLeft] = leftStage
+            calibrationData['left'][-averageSpeedLeft] = leftStage
             calibrationData['right'][averageSpeedRight] = rightStage
             print('Average speed left: ' + str(averageSpeedLeft))
             print('Average speed right: ' + str(averageSpeedRight))
