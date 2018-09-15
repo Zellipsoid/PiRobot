@@ -16,8 +16,8 @@ class Servos(object):
         self.LSERVO = 0
         self.RSERVO = 1
         self.calibrationData = json.load(open('calibration.json', 'r'), object_pairs_hook=OrderedDict) #opens json as ordered dict
-        self.calibrationData['right'] = {int(k):v for k, v in self.calibrationData['right'].items()} #converts keys from strings to floats for right side
-        self.calibrationData['left'] = {int(k):v for k, v in self.calibrationData['left'].items()} #converts keys from strings to floats for left side
+        self.calibrationData['right'] = {float(k):v for k, v in self.calibrationData['right'].items()} #converts keys from strings to floats for right side
+        self.calibrationData['left'] = {float(k):v for k, v in self.calibrationData['left'].items()} #converts keys from strings to floats for left side
 
     def stopServos(self):
         self.pwm.set_pwm(self.LSERVO, 0, 0)
@@ -47,6 +47,6 @@ class Servos(object):
         print(self.calibrationData['left']['0.37524266106022125'])
         
     def retrieveJSONSpeed(self, side, rps): #side is string
-        index = bisect.bisect_left(self.calibrationData[side].keys(), rps)
-        return min(abs(rps - self.calibrationData[side].values[index]), abs(rps - self.calibrationData[side].values[index - 1]))
+        index = bisect.bisect_left(list(self.calibrationData[side].keys()), rps)
+        return min(abs(rps - self.calibrationData[side].values()[index]), abs(rps - self.calibrationData[side].values()[index - 1]))
         

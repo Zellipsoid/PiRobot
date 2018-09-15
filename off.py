@@ -48,9 +48,5 @@ GPIO.setup(RENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(LENCODER, GPIO.RISING, enc.onLeftEncode)
 GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 
-#f = open("data.txt", "w")
-#calibrateSpeeds(.1)
-#f.closer()
-
-serv.retrieveJSONSpeed("right", 0.7)
-#testing dropbox sync
+serv.setSpeeds(1.5, 1.5)
+  
