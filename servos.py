@@ -4,6 +4,8 @@ import signal
 import math
 import encoders
 import json
+import bisect
+from collections import OrderedDict
 
 class Servos(object):
 
@@ -13,8 +15,9 @@ class Servos(object):
         self.pwm.set_pwm_freq(50)
         self.LSERVO = 0
         self.RSERVO = 1
-        self.calFile = open('calibration.json', 'r')
-        self.calibrationData = json.load(self.calFile)
+        self.calibrationData = json.load(open('calibration.json', 'r'), object_pairs_hook=OrderedDict) #opens json as ordered dict
+        self.calibrationData['right'] = {int(k):v for k, v in self.calibrationData['right'].items()} #converts keys from strings to floats for right side
+        self.calibrationData['left'] = {int(k):v for k, v in self.calibrationData['left'].items()} #converts keys from strings to floats for left side
 
     def stopServos(self):
         self.pwm.set_pwm(self.LSERVO, 0, 0)
@@ -43,5 +46,7 @@ class Servos(object):
     def printCalibrationData(self):
         print(self.calibrationData['left']['0.37524266106022125'])
         
-    def retrieveJSONSpeed(self, side, rps):
+    def retrieveJSONSpeed(self, side, rps): #side is string
+        index = bisect.bisect_left(self.calibrationData[side].keys(), rps)
+        return min(abs(rps - self.calibrationData[side].values[index]), abs(rps - self.calibrationData[side].values[index - 1]))
         
