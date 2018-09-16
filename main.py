@@ -48,7 +48,7 @@ GPIO.setup(RENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(LENCODER, GPIO.RISING, enc.onLeftEncode)
 GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 
-serv.setSpeedsvw(4, 0)
+serv.setSpeedsVW(4, 0)
 while True:
     time.sleep(1)
     print(enc.getSpeeds())

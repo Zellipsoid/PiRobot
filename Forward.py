@@ -46,7 +46,12 @@ except ValueError:
 inchesPerSecond = distance / time
 if serv.getMaxIPS() < inchesPerSecond:
     sys.exit("Error: requested speed exceeds maximum servo output")
-
+#press enter to go
+go = False
+while not go:
+    hasInput = input("Press enter to go!")
+    if hasInput == '':
+        go = True
 #set speed and track distance
 print("Setting speed to " + str(inchesPerSecond) + " inches/second")
 enc.resetCounts()
@@ -55,6 +60,13 @@ serv.setSpeedsIPS(inchesPerSecond, inchesPerSecond)
 while sum(enc.getDistanceTraveledIPS()) / 2 < distance:
     pass
 serv.stopServos()
-print("Total distance traveled: " + str(sum(enc.getDistanceTraveledIPS()) / 2) + " inches")
+distanceTraveled = enc.getDistanceTraveledIPS()
+print("Total distance traveled: " + str(sum(distanceTraveled) / 2) + " inches")
 print("Total elapsed time: " + str(enc.getElapsedTime()) + " seconds")
-print("Average speed: " + str(sum(enc.getDistanceTraveledIPS()) / 2 / enc.getElapsedTime()) + " inches/second")
+print("Average speed: " + str(sum(distanceTraveled) / 2 / enc.getElapsedTime()) + " inches/second")
+if (distanceTraveled[0] > distanceTraveled[1]):
+    print("Left wheel traveled " + str((distanceTraveled[0] / distanceTraveled[1] - 1) * 100) + "% more than right wheel")
+elif(distanceTraveled[1] > distanceTraveled[0]):
+    print("Right wheel traveled " + str((distanceTraveled[1] / distanceTraveled[0] - 1) * 100) + "% more than left wheel")
+else:
+    print("Amazingly, both wheels traveled the exact same distance! (Go buy a lotto ticket!)")

@@ -69,7 +69,7 @@ class Servos(object):
     def setSpeedsIPS(self, ipsLeft, ipsRight):
         self.setSpeedsRPS(ipsLeft / (self.wheelsDiameter * math.pi), ipsRight / (self.wheelsDiameter * math.pi))
 
-    def setSpeedsvw(self, velocity, omega):
+    def setSpeedsVW(self, velocity, omega):
         if omega != 0:
             radius = velocity / omega
             vR = velocity + omega * (radius + self.distanceBetweenWheels / 2)
