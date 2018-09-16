@@ -24,6 +24,7 @@ class Encoders(object):
         self.calibrationArrayRight = [] #these two arrays hold values for speed that will be averages for each speed increment and put into the json
         self.calibrationArrayLeft = []
         self.accuracy = 10 #will record speed this number of time and average result
+        self.wheelsDiameter = 2.61
 
     # This function is called when the left encoder detects a rising edge signal.
     def onLeftEncode(self, pin):
@@ -51,40 +52,29 @@ class Encoders(object):
         self.rightTicks = 0
         self.leftTicks = 0
 
+    def resetTime(self):
+        self.startTime = time.time()
+
     def getCounts(self):
         return (self.leftTicks, self.rightTicks)
+
+    def getDistanceTraveledRPS(self):
+        return (self.leftTicks / 32, self.rightTicks / 32)
+    
+    def getDistanceTraveledIPS(self):
+        return (self.leftTicks / 32 * self.wheelsDiameter * math.pi, self.rightTicks / 32 * self.wheelsDiameter * math.pi)
 
     def getSpeeds(self):
         totalTime = self.getElapsedTime()
         moving = self.isSpeedZero()
-        #pprint(self.velArrayLeft)
-        #pprint(self.velArrayRight)
         leftLength = len(self.velArrayLeft)
         rightLength = len(self.velArrayRight)
-        # return(
-        # (velArrayLeft[1][leftLength - 1] - velArrayLeft[1][leftLength - 2]) / (velArrayLeft[0][leftLength - 1] - velArrayLeft[0][leftLength - 2]),
-        # (velArrayRight[1][rightLength - 1] - velArrayRight[1][rightLength - 2]) / (velArrayRight[0][rightLength - 1] - velArrayRight[0][rightLength - 2]))
         if rightLength > 0 and leftLength > 0 and totalTime > 0:
-            # I think all of this was wrong
-            # self.totalTimeLeft = 0
-            # self.totalTicksLeft = 0
-            # for (time, ticks) in self.velArrayLeft:
-            #     self.totalTimeLeft += time
-            #     self.totalTicksLeft += ticks 
-            #     #print(val)
-            # self.totalTimeRight = 0
-            # self.totalTicksRight = 0
-            # for (time, ticks) in self.velArrayRight:
-            #     self.totalTimeRight += time
-            #     self.totalTicksRight += ticks
-            #     #print(val)
             if ((self.velArrayLeft[leftLength - 1][0] - self.velArrayLeft[0][0]) > 0 and (self.velArrayRight[rightLength - 1][0] - self.velArrayRight[0][0]) > 0):
                 speedLeft = (self.velArrayLeft[leftLength - 1][1] - self.velArrayLeft[0][1]) / (self.velArrayLeft[leftLength - 1][0] - self.velArrayLeft[0][0])
                 speedRight = (self.velArrayRight[rightLength - 1][1] - self.velArrayRight[0][1]) / (self.velArrayRight[rightLength - 1][0] - self.velArrayRight[0][0])
             else:
-                print('is failing if')
                 return (0, 0)
-            # return (self.totalTicksLeft / totalTime / 32 * moving[0], self.totalTicksRight / totalTime / 32 * moving[1])
             return (speedLeft / 32 * moving[0], speedRight / 32 * moving[1])
         else:
             return (0, 0)
@@ -102,8 +92,6 @@ class Encoders(object):
             timeSinceRight = time.time() - self.velArrayRight[len(self.velArrayRight) - 1][0]
         else:
             timeSinceRight = 0
-        #print((timeSinceLeft, timeSinceRight))
-            
         if timeSinceRight > self.notMovingTimeout:
             rightMoving = 0
         if timeSinceLeft > self.notMovingTimeout:
@@ -113,6 +101,8 @@ class Encoders(object):
 
     def calibrateSpeeds(self):
         calServ = servos.Servos()
+        self.wheelTicksLeft = 0
+        self.wheelTicksRight = 0
         self.calibrating = True
         print('Starting calibration...')
         calibrationData = {} #dictionary containing calibration data
@@ -126,11 +116,6 @@ class Encoders(object):
             calServ.setSpeeds(leftStage, rightStage)
             print('Waiting for ticks...')
             while(self.wheelTicksLeft < self.accuracy + 1 and self.wheelTicksRight < self.accuracy + 1): #while loop is just to wait for more ticks
-                #speed = self.getSpeeds()
-                #if speed[0] == 0 or speed[1] == 0 and rightStage > 1.4 and leftStage < 1.6:
-                    #rightStage = 1.5
-                    #leftStage = 1.5
-                    #break
                 pass
             print('Got the ticks!')
             averageSpeedLeft = sum(self.calibrationArrayLeft[-self.accuracy:]) / self.accuracy #averages last x elements of left array, left out first because it may not be accurate
@@ -144,12 +129,9 @@ class Encoders(object):
             self.calibrationArrayRight = []
             self.wheelTicksLeft = 0
             self.wheelTicksRight = 0
-            # if (leftStage > 1.6 and rightStage < 1.4):
-            #     rightStage += 0.01
-            #     leftStage -= 0.01
-            if(leftStage > 1.52 and rightStage < 1.48): #would be miserable going slower than this
-                rightStage += 0.005
-                leftStage -= 0.005
+            if(leftStage > 1.51 and rightStage < 1.49): #would be miserable going slower than this
+                rightStage += 0.003
+                leftStage -= 0.003
             else:
                 rightStage = 1.5
                 leftStage = 1.5
@@ -162,11 +144,6 @@ class Encoders(object):
             calServ.setSpeeds(leftStage, rightStage)
             print('Waiting for ticks...')
             while(self.wheelTicksLeft < self.accuracy + 1 and self.wheelTicksRight < self.accuracy + 1): #while loop is just to wait for more ticks
-                #speed = self.getSpeeds()
-                #if speed[0] == 0 or speed[1] == 0 and rightStage > 1.4 and leftStage < 1.6:
-                    #rightStage = 1.5
-                    #leftStage = 1.5
-                    #break
                 pass
             print('Got the ticks!')
             averageSpeedLeft = sum(self.calibrationArrayLeft[-self.accuracy:]) / self.accuracy #averages last x elements of left array, left out first because it may not be accurate
@@ -180,12 +157,9 @@ class Encoders(object):
             self.calibrationArrayRight = []
             self.wheelTicksLeft = 0
             self.wheelTicksRight = 0
-            # if (leftStage < 1.4 and rightStage > 1.6):
-            #     rightStage -= 0.01
-            #     leftStage += 0.01
-            if(leftStage < 1.48 and rightStage > 1.52): #would be miserable going slower than this
-                rightStage -= 0.005
-                leftStage += 0.005
+            if(leftStage < 1.49 and rightStage > 1.51): #would be miserable going slower than this
+                rightStage -= 0.003
+                leftStage += 0.003
             else:
                 rightStage = 1.5
                 leftStage = 1.5
@@ -195,4 +169,6 @@ class Encoders(object):
         with open('calibration.json', 'w') as writeFile:
             json.dump(calibrationData, writeFile, indent=4, separators=(',',': '), sort_keys=True)
         self.calibrating = False
+        self.wheelTicksLeft = 0
+        self.wheelTicksRight = 0
 

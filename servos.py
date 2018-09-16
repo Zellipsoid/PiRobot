@@ -20,9 +20,8 @@ class Servos(object):
         self.calibrationDataLeftMS = []
         self.calibrationDataRightMS = []
         self.loadJSON()
-        #  = json.load(open('calibration.json', 'r'), object_pairs_hook=OrderedDict) #opens json as ordered dict
-        # self.calibrationData['right'] = {float(k):v for k, v in self.calibrationData['right'].items()} #converts keys from strings to floats for right side
-        # self.calibrationData['left'] = {float(k):v for k, v in self.calibrationData['left'].items()} #converts keys from strings to floats for left side
+        self.wheelsDiameter = 2.61
+        self.distanceBetweenWheels = 3.95
 
     def loadJSON(self):
         left = False
@@ -68,16 +67,27 @@ class Servos(object):
         
 
     def setSpeedsIPS(self, ipsLeft, ipsRight):
-        self.setSpeedsRPS(ipsLeft / (2.61 * math.pi), ipsRight / (2.61 * math.pi))
+        self.setSpeedsRPS(ipsLeft / (self.wheelsDiameter * math.pi), ipsRight / (self.wheelsDiameter * math.pi))
 
-# def setSpeedsvw(v, w):
-        #self.pwm.set_pwm(self.LSERVO, 0, math.floor(left / 20 * 4096))
-        #self.pwm.set_pwm(self.RSERVO, 0, math.floor((3 - right) / 20 * 4096))
+    def setSpeedsvw(self, velocity, omega):
+        if omega != 0:
+            radius = velocity / omega
+            vR = velocity + omega * (radius + self.distanceBetweenWheels / 2)
+            vL = velocity + omega * (radius - self.distanceBetweenWheels / 2)
+            self.setSpeedsIPS(vL, vR)
+        else:
+            self.setSpeedsIPS(velocity, velocity)
 
     def printCalibrationData(self):
         print(self.calibrationDataLeft)
         print(self.calibrationDataRight)
         
+    def getMaxRPS(self):
+        return min(self.calibrationDataRightRPS[len(self.calibrationDataRightRPS) - 1], self.calibrationDataLeftRPS[len(self.calibrationDataLeftRPS) - 1])
+    
+    def getMaxIPS(self):
+        return min(self.calibrationDataRightRPS[len(self.calibrationDataRightRPS) - 1] * self.wheelsDiameter * math.pi, self.calibrationDataLeftRPS[len(self.calibrationDataLeftRPS) - 1] * self.wheelsDiameter * math.pi)
+
     def retrieveJSONSpeed(self, side, rps): #side is string
         if side == "left":
             index = bisect.bisect_left(self.calibrationDataLeftRPS, rps) #finds first index that has key larger than rps
