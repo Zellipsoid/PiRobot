@@ -21,7 +21,7 @@ class Servos(object):
         self.calibrationDataRightMS = []
         self.loadJSON()
         self.wheelsDiameter = 2.61
-        self.distanceBetweenWheels = 3.95
+        self.distanceBetweenWheels = 4.25
 
     def loadJSON(self):
         left = False
@@ -62,8 +62,16 @@ class Servos(object):
 
     #all of this is for calibration    
 
-    def setSpeedsRPS(self, rpsLeft, rpsRight):        
-        self.setSpeeds(self.retrieveJSONSpeed("left", rpsLeft), self.retrieveJSONSpeed("right", rpsRight))
+    def setSpeedsRPS(self, rpsLeft, rpsRight):
+        if rpsLeft == 0:
+            left = 0
+        else:
+            left = self.retrieveJSONSpeed("left", rpsLeft)
+        if rpsRight == 0:
+            right = 0
+        else:
+            right = self.retrieveJSONSpeed("right", rpsRight)
+        self.setSpeeds(left, right)
         
 
     def setSpeedsIPS(self, ipsLeft, ipsRight):
@@ -72,16 +80,27 @@ class Servos(object):
     def setSpeedsVW(self, velocity, omega):
         if omega != 0:
             radius = velocity / omega
-            vR = velocity + omega * (radius + self.distanceBetweenWheels / 2)
-            vL = velocity + omega * (radius - self.distanceBetweenWheels / 2)
+            outerCircumference = 2 * (radius + self.distanceBetweenWheels / 2) * math.pi
+            circumference = 2 * (radius) * math.pi
+            innerCircumference = 2 * (radius - self.distanceBetweenWheels / 2) * math.pi
+            # circumferenceRatio = outerCircumference / innerCircumference
+            # vR = math.sqrt(2 * velocity)
+            # vL = 2 * velocity / (circumferenceRatio + 1)
+            vL = velocity * innerCircumference / circumference
+            vR = velocity * outerCircumference / circumference
             self.setSpeedsIPS(vL, vR)
+            return (vL, vR)
         else:
             self.setSpeedsIPS(velocity, velocity)
+            return (velocity, velocity)
 
     def printCalibrationData(self):
         print(self.calibrationDataLeft)
         print(self.calibrationDataRight)
-        
+    
+    def getDistanceBetweenWheels(self):
+        return self.distanceBetweenWheels
+
     def getMaxRPS(self):
         return min(self.calibrationDataRightRPS[len(self.calibrationDataRightRPS) - 1], self.calibrationDataLeftRPS[len(self.calibrationDataLeftRPS) - 1])
     

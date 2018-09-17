@@ -60,11 +60,11 @@ GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 if len(sys.argv) != 3:
     sys.exit('Error: forward.py requires 2 arguments: distance (in), time (s)')
 try:
-    time = float(sys.argv[2])
+    targetTime = float(sys.argv[2])
     distance = float(sys.argv[1])
 except ValueError:
     sys.exit('Error: arguments must be numbers: distance (in), time (s)')
-inchesPerSecond = distance / time
+inchesPerSecond = distance / targetTime
 if serv.getMaxIPS() < inchesPerSecond:
     sys.exit("Error: requested speed exceeds maximum servo output")
 #press enter to go
@@ -79,7 +79,7 @@ enc.resetCounts()
 enc.resetTime()
 serv.setSpeedsIPS(inchesPerSecond, inchesPerSecond)
 while sum(enc.getDistanceTraveledIPS()) / 2 < distance:
-    pass
+    time.sleep(0.0025) #avoid setting speeds too much
     straightenPath(inchesPerSecond, inchesPerSecond)
 serv.stopServos()
 distanceTraveled = enc.getDistanceTraveledIPS()
