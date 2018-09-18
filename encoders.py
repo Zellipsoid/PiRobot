@@ -6,6 +6,7 @@ import pprint
 import servos
 import json
 import xlsxwriter
+import RPi.GPIO as GPIO
 
 
 class Encoders(object):
@@ -29,6 +30,27 @@ class Encoders(object):
 
         self.graphing = False #set this to true when writing to excel, otherwise should be false. Will not calibrate when true.
 
+        # Set the pin numbering scheme to the numbering shown on the robot itself.
+        LENCODER = 17
+        RENCODER = 18
+        GPIO.setmode(GPIO.BCM)
+
+        # Set encoder pins as input
+        # Also enable pull-up resistors on the encoder pins
+        # This ensures a clean 0V and 3.3V is always outputted from the encoders.
+        GPIO.setup(LENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(RENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+        # Attach a rising edge interrupt to the encoder pins
+        GPIO.add_event_detect(LENCODER, GPIO.RISING, self.onLeftEncode)
+        GPIO.add_event_detect(RENCODER, GPIO.RISING, self.onRightEncode)
+        
+    def ctrlC(self, signum, frame):
+        print("Exiting")
+        serv = servos.Servos()
+        serv.stopServos()
+        GPIO.cleanup()
+        exit()
     # This function is called when the left encoder detects a rising edge signal.
     def onLeftEncode(self, pin):
         #print("Left encoder ticked!")
