@@ -64,7 +64,7 @@ try:
     distance = float(sys.argv[1])
 except ValueError:
     sys.exit('Error: arguments must be numbers: distance (in), time (s)')
-inchesPerSecond = distance / time
+inchesPerSecond = distance / targetTime
 if distance > 0 and serv.getMaxIPS() < inchesPerSecond:
     sys.exit("Error: requested speed exceeds maximum servo output")
 elif distance < 0 and serv.getMinIPS() > inchesPerSecond:
@@ -93,4 +93,4 @@ if (distanceTraveled[0] > distanceTraveled[1]):
 elif(distanceTraveled[1] > distanceTraveled[0]):
     print("Right wheel traveled " + str((distanceTraveled[1] / distanceTraveled[0] - 1) * 100) + "% more than left wheel")
 else:
-    print("Amazingly, both wheels traveled the exact same distance! (Go buy a lotto ticket!)")
+    print("Both wheels traveled the exact same distance!")
