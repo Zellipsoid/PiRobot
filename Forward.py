@@ -19,6 +19,27 @@ def ctrlC(signum, frame):
     GPIO.cleanup()
     exit()
 
+def straightenPath(desiredSpeedLeft, desiredSpeedRight):
+    ratio = desiredSpeedLeft / desiredSpeedRight
+    ticks = enc.getCounts()
+    if (ticks[1] != 0):
+        actualRatio = ticks[0] / ticks[1]
+    else:
+        actualRatio = 1
+    percentError = (actualRatio / ratio - 1) * 100
+    if percentError > 1.5:
+        # print("Slowing left wheel")
+        differential = desiredSpeedRight * 0.5
+        serv.setSpeedsIPS(desiredSpeedLeft - differential, desiredSpeedRight + differential)
+    elif percentError < -1.5:
+        # print("Slowing right wheel")
+        differential = desiredSpeedLeft * 0.5
+        serv.setSpeedsIPS(desiredSpeedLeft + differential, desiredSpeedRight - differential)
+    else:
+        serv.setSpeedsIPS(desiredSpeedLeft, desiredSpeedRight)
+
+
+
 # Attach the Ctrl+C signal interrupt
 signal.signal(signal.SIGINT, ctrlC)
     
@@ -39,7 +60,7 @@ GPIO.add_event_detect(RENCODER, GPIO.RISING, enc.onRightEncode)
 if len(sys.argv) != 3:
     sys.exit('Error: forward.py requires 2 arguments: distance (in), time (s)')
 try:
-    time = float(sys.argv[2])
+    targetTime = float(sys.argv[2])
     distance = float(sys.argv[1])
 except ValueError:
     sys.exit('Error: arguments must be numbers: distance (in), time (s)')
@@ -60,7 +81,8 @@ enc.resetCounts()
 enc.resetTime()
 serv.setSpeedsIPS(inchesPerSecond, inchesPerSecond)
 while sum(enc.getDistanceTraveledIPS()) / 2 < abs(distance):
-    pass
+    time.sleep(0.0025) #avoid setting speeds too much
+    straightenPath(inchesPerSecond, inchesPerSecond)
 serv.stopServos()
 distanceTraveled = enc.getDistanceTraveledIPS()
 print("Total distance traveled: " + str(sum(distanceTraveled) / 2) + " inches")
