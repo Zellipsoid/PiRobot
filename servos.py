@@ -88,6 +88,12 @@ class Servos(object):
     def getMaxIPS(self):
         return min(self.calibrationDataRightRPS[len(self.calibrationDataRightRPS) - 1] * self.wheelsDiameter * math.pi, self.calibrationDataLeftRPS[len(self.calibrationDataLeftRPS) - 1] * self.wheelsDiameter * math.pi)
 
+    def getMinRPS(self):
+        return max(self.calibrationDataRightRPS[0], self.calibrationDataLeftRPS[0])
+
+    def getMinIPS(self):
+        return max(self.calibrationDataRightRPS[0] * self.wheelsDiameter * math.pi, self.calibrationDataLeftRPS[0] * self.wheelsDiameter * math.pi)
+
     def retrieveJSONSpeed(self, side, rps): #side is string
         if side == "left":
             index = bisect.bisect_left(self.calibrationDataLeftRPS, rps) #finds first index that has key larger than rps

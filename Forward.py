@@ -44,7 +44,9 @@ try:
 except ValueError:
     sys.exit('Error: arguments must be numbers: distance (in), time (s)')
 inchesPerSecond = distance / time
-if serv.getMaxIPS() < inchesPerSecond:
+if distance > 0 and serv.getMaxIPS() < inchesPerSecond:
+    sys.exit("Error: requested speed exceeds maximum servo output")
+elif distance < 0 and serv.getMinIPS() > inchesPerSecond:
     sys.exit("Error: requested speed exceeds maximum servo output")
 #press enter to go
 go = False
@@ -57,7 +59,7 @@ print("Setting speed to " + str(inchesPerSecond) + " inches/second")
 enc.resetCounts()
 enc.resetTime()
 serv.setSpeedsIPS(inchesPerSecond, inchesPerSecond)
-while sum(enc.getDistanceTraveledIPS()) / 2 < distance:
+while sum(enc.getDistanceTraveledIPS()) / 2 < abs(distance):
     pass
 serv.stopServos()
 distanceTraveled = enc.getDistanceTraveledIPS()
