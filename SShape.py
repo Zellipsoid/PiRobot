@@ -74,7 +74,7 @@ print('Ratio should be ' + str((abs(R1) + serv.getDistanceBetweenWheels() / 2) /
 print("Setting speed to " + str(velocity) + " inches/second and angular velocity to " + str(omega1) + " radians/second")
 enc.resetCounts()
 enc.resetTime()
-desiredSpeedTuple = serv.setSpeedsVW(velocity, omega1 * 1.125) #get correct ratio of wheel speed; increase omega to account for friction
+desiredSpeedTuple = serv.setSpeedsVW(velocity, omega1 * 1.225) #get correct ratio of wheel speed; increase omega to account for friction
 while sum(enc.getDistanceTraveledIPS()) / 2 < distance1:
     time.sleep(0.0025) #avoid setting speeds too much
     correctPath(desiredSpeedTuple[0], desiredSpeedTuple[1]) #fixes incorrect paths
@@ -98,7 +98,7 @@ print('Ratio should be ' + str((abs(R2) + serv.getDistanceBetweenWheels() / 2) /
 print("Setting speed to " + str(velocity) + " inches/second and angular velocity to " + str(omega2) + " radians/second")
 enc.resetCounts()
 enc.resetTime()
-desiredSpeedTuple = serv.setSpeedsVW(velocity, omega2 * 1.125) #get correct ratio of wheel speed; increase omega to account for friction
+desiredSpeedTuple = serv.setSpeedsVW(velocity, omega2 * 1.225) #get correct ratio of wheel speed; increase omega to account for friction
 while sum(enc.getDistanceTraveledIPS()) / 2 < distance2:
     time.sleep(0.0025) #avoid setting speeds too much
     correctPath(desiredSpeedTuple[0], desiredSpeedTuple[1]) #fixes incorrect paths
