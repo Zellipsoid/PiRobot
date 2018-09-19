@@ -7,6 +7,7 @@ import servos
 import json
 import xlsxwriter
 import RPi.GPIO as GPIO
+import sensors
 
 
 class Encoders(object):
@@ -45,12 +46,6 @@ class Encoders(object):
         GPIO.add_event_detect(LENCODER, GPIO.RISING, self.onLeftEncode)
         GPIO.add_event_detect(RENCODER, GPIO.RISING, self.onRightEncode)
         
-    def ctrlC(self, signum, frame):
-        print("Exiting")
-        serv = servos.Servos()
-        serv.stopServos()
-        GPIO.cleanup()
-        exit()
     # This function is called when the left encoder detects a rising edge signal.
     def onLeftEncode(self, pin):
         #print("Left encoder ticked!")

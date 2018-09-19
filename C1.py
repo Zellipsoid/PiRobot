@@ -13,7 +13,7 @@ enc = encoders.Encoders()
 serv = servos.Servos()
 
 # Attach the Ctrl+C signal interrupt
-signal.signal(signal.SIGINT, enc.ctrlC)
+signal.signal(signal.SIGINT, ctrlC)
 
 def ctrlC(signum, frame):
     print("Exiting")
