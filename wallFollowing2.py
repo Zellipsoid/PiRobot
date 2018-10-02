@@ -12,10 +12,10 @@ import signal
 enc = encoders.Encoders()
 serv = servos.Servos()
 sens = sensors.Sensors()
-goalInches = 5
+goalInches = 5.5
 constantKp = 1
 turningLinearVel = 0.1
-turningAngularVel = 2
+turningAngularVel = 1.5
 def ctrlC(signum, frame):
     print("Exiting")
     serv.stopServos()
@@ -30,12 +30,16 @@ def wallFollow(side, distance):
         tempKp = constantKp
     difference = goalInches - distance
     omega =  tempKp * difference
-    # omega = -constantKp * difference
+    if omega > 1.5:
+        omega = 1.5
+    if omega < -1.5:
+        omega = -1.5
+    print(omega)
     serv.setSpeedsVW(5, omega)
     #AVOID FRONT WALLS
-    closeEnoughToLoop = 7
+    closeEnoughToLoop = 6
     while sens.getProxForwardInches() < closeEnoughToLoop:
-        closeEnoughToLoop = 18
+        closeEnoughToLoop = 15
         if (side == 'left'):
             serv.setSpeedsVW(turningLinearVel, -turningAngularVel)
         else:
@@ -51,9 +55,9 @@ lastWall = 'right'
 while True:
     leftDistance = sens.getProxLeftInches()
     rightDistance = sens.getProxRightInches()
-    if leftDistance > 15 and rightDistance > 15:
-        serv.setSpeedsVW(5, 0) 
-    elif (rightDistance < leftDistance and leftDistance < 15):
+    #if leftDistance > 15 and rightDistance > 15:
+    #    serv.setSpeedsVW(5, 0) 
+    if (rightDistance < leftDistance and leftDistance < 15):
         lastWall = 'right'
         wallFollow('right', rightDistance)
     elif leftDistance < rightDistance and rightDistance < 15:
