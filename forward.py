@@ -48,7 +48,7 @@ except ValueError:
 inchesPerSecond = distance / targetTime
 if distance > 0 and serv.getMaxIPS() < inchesPerSecond:
     sys.exit("Error: requested speed exceeds maximum servo output")
-elif distance < 0 and serv.getMinIPS() > inchesPerSecond:
+elif distance < 0 and serv.getMaxIPSBackwards() > inchesPerSecond:
     sys.exit("Error: requested speed exceeds maximum servo output")
 #press enter to go
 go = False

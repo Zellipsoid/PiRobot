@@ -11,6 +11,11 @@ import signal
 #objects for servos, encoders, sensors, and camera
 enc = encoders.Encoders()
 serv = servos.Servos()
+def ctrlC(signum, frame):
+    print("Exiting")
+    serv.stopServos()
+    GPIO.cleanup()
+    exit()
 # Attach the Ctrl+C signal interrupt
 signal.signal(signal.SIGINT, ctrlC)
 

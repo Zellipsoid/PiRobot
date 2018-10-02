@@ -25,4 +25,4 @@ signal.signal(signal.SIGINT, ctrlC)
 while True:
     time.sleep(1)
     # print(enc.getSpeeds())
-    print(sens.getProxForward())
+    print(sens.getProxForwardInches())

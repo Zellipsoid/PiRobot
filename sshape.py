@@ -40,7 +40,7 @@ def correctPath(desiredSpeedLeft, desiredSpeedRight):
         serv.setSpeedsIPS(desiredSpeedLeft, desiredSpeedRight)
 
 def omegaMultiplier(omega, radius):
-    return omega * (1.3 + (radius * 0.001))
+    return omega * (1.1 + (radius * 0.005))
     # return omega * 1.3
 
 #check for problems and set variables

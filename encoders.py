@@ -72,6 +72,10 @@ class Encoders(object):
         self.rightTicks = 0
         self.leftTicks = 0
 
+    def subtractCounts(self, sub): # will increase accuracy
+        self.rightTicks -= sub
+        self.leftTicks -= sub
+        
     def resetTime(self):
         self.startTime = time.time()
 
