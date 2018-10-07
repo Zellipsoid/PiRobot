@@ -34,12 +34,12 @@ def wallFollow(side, distance):
         omega = 1.5
     if omega < -1.5:
         omega = -1.5
-    print(omega)
+    #print(distance)
     serv.setSpeedsVW(5, omega)
     #AVOID FRONT WALLS
     closeEnoughToLoop = 6
     while sens.getProxForwardInches() < closeEnoughToLoop:
-        closeEnoughToLoop = 15
+        closeEnoughToLoop = 14
         if (side == 'left'):
             serv.setSpeedsVW(turningLinearVel, -turningAngularVel)
         else:
@@ -57,10 +57,10 @@ while True:
     rightDistance = sens.getProxRightInches()
     #if leftDistance > 15 and rightDistance > 15:
     #    serv.setSpeedsVW(5, 0) 
-    if (rightDistance < leftDistance and leftDistance < 15):
+    if (rightDistance < leftDistance and rightDistance < 15):
         lastWall = 'right'
         wallFollow('right', rightDistance)
-    elif leftDistance < rightDistance and rightDistance < 15:
+    elif leftDistance < rightDistance and leftDistance < 15:
         lastWall = 'left'
         wallFollow('left', leftDistance)
     elif lastWall == 'right':
