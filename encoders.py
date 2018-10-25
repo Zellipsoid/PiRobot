@@ -47,6 +47,8 @@ class Encoders(object):
         GPIO.add_event_detect(RENCODER, GPIO.RISING, self.onRightEncode)
         
     # This function is called when the left encoder detects a rising edge signal.
+    def getWheelsDiameter(self):
+        return self.wheelsDiameter
     def onLeftEncode(self, pin):
         #print("Left encoder ticked!")
         self.leftTicks += 1

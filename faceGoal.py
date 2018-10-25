@@ -5,10 +5,10 @@ import encoders
 import servos
 import sensors
 import camera
-import bugHelpers
 import time
 import RPi.GPIO as GPIO
 import signal
+import bugHelpers
 
 #objects for servos, encoders, sensors, and camera
 enc = encoders.Encoders()
@@ -23,6 +23,7 @@ def ctrlC(signum, frame):
     sens.stopRanging()
     GPIO.cleanup()
     exit()
+signal.signal(signal.SIGINT, ctrlC)
 
 while True:
-    print(bug.isGoalImmediatelyAhead(cam.getBlobStats()))
+    bug.faceGoal(cam.getBlobStats())

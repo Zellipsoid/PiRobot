@@ -120,6 +120,8 @@ class Servos(object):
 
     def setSpeedsVW(self, velocity, omega):
         if omega != 0:
+            if velocity == 0:
+                velocity = 0.0001
             radius = velocity / omega
             outerCircumference = 2 * (radius + self.distanceBetweenWheels / 2) * math.pi
             circumference = 2 * (radius) * math.pi

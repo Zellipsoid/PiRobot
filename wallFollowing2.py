@@ -12,7 +12,7 @@ import signal
 enc = encoders.Encoders()
 serv = servos.Servos()
 sens = sensors.Sensors()
-goalInches = 5.5
+goalInches = 5
 constantKp = 1
 turningLinearVel = 0.1
 turningAngularVel = 1.5
@@ -58,12 +58,16 @@ while True:
     #if leftDistance > 15 and rightDistance > 15:
     #    serv.setSpeedsVW(5, 0) 
     if (rightDistance < leftDistance and rightDistance < 15):
+        print('wall to right')
         lastWall = 'right'
         wallFollow('right', rightDistance)
     elif leftDistance < rightDistance and leftDistance < 15:
+        print('wall to left')
         lastWall = 'left'
         wallFollow('left', leftDistance)
     elif lastWall == 'right':
+        print('wall to right default')
         wallFollow('right', rightDistance)
     else:
+        print('wall to left default')
         wallFollow('left', leftDistance)
