@@ -20,18 +20,27 @@ def ctrlC(signum, frame):
     exit()
 signal.signal(signal.SIGINT, ctrlC)
 
+side = "left"
 while True:
     stats = cam.getBlobStats()
     centered = bug.isGoalCentered(stats)
+    dangerRight = bug.isObstacleToRight()
+    dangerLeft = bug.isObstacleToLeft() 
     if (bug.isGoalImmediatelyAhead(stats) and bug.isObstacleAhead()):
         print('in front of goal')
         serv.stopServos()
-    if bug.isObstacleAhead() or wallFollowing:
-        print('bugging')
-        if bug.isObstacleAhead() or not bug.isGoalCentered(stats):
-            bug.wallFollow(stats, "right")
+    if bug.isObstacleAhead() or wallFollowing or dangerRight or dangerLeft:
+        print('checking bug')
+        if dangerLeft or dangerRight or not bug.isGoalCentered(stats):
+            print('bugging')
+            if dangerRight:
+                side = "right"
+            elif dangerLeft:
+                side = "left"
+            bug.wallFollow(stats, side)
             wallFollowing = True
         else:
+            print('ending bug')
             wallFollowing = False
     elif not centered:
         print('not centered')

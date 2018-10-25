@@ -11,7 +11,8 @@ class bugHelpers(object):
         self.sens = sensors.Sensors()
         self.enc = encoders.Encoders()
         self.lastSeenGoalDirection = 'right'
-        self.forwardDistanceThreshold = 6
+        self.forwardDistanceThreshold = 7
+        self.sideDistanceThreshold = 4
         self.speed = 4
 
     def faceGoal(self, blobStats):
@@ -65,9 +66,15 @@ class bugHelpers(object):
         else:
             return False
 
+    def isObstacleToLeft(self):
+        return self.sens.getProxLeftInches() < self.sideDistanceThreshold
+
+    def isObstacleToRight(self):
+        return self.sens.getProxRightInches() < self.sideDistanceThreshold
+
     def wallFollow(self, blobStats, side):
         goalInches = 5
-        constantKp = 1
+        constantKp = 0.5
         turningLinearVel = 0.1
         turningAngularVel = 1.5
     
@@ -86,6 +93,7 @@ class bugHelpers(object):
             sideDistance = breakLoopSide + 1
             self.enc.resetCounts() #resets counts of wheels. Keeps count, if robot turns more than 120 degrees, breaks loop
             while ((self.sens.getProxForwardInches() < breakLoopFront or sideDistance > breakLoopSide) and self.enc.getDistanceTraveledIPS()[0] < self.enc.getWheelsDiameter() * math.pi / 3): #breaks loop if turns more than a third of circle
+                print('circling')
                 if (side == 'left'):                    
                     self.serv.setSpeedsVW(turningLinearVel, -turningAngularVel)
                     sideDistance = self.sens.getProxLeftInches()
@@ -93,13 +101,16 @@ class bugHelpers(object):
                     self.serv.setSpeedsVW(turningLinearVel, turningAngularVel)
                     sideDistance = self.sens.getProxRightInches()
         if side == 'left':
+            print('following left')
             tempKp = -constantKp
             distance = self.sens.getProxLeftInches()
         else:
+            print('following right')
             tempKp = constantKp
             distance = self.sens.getProxRightInches()
         difference = goalInches - distance
         omega =  tempKp * difference
+        print(omega)
         if omega > 1.5:
             omega = 1.5
         if omega < -1.5:
