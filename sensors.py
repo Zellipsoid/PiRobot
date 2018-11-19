@@ -63,6 +63,14 @@ class Sensors(object):
     def getProxLeftInches(self):
         return self.getProxLeft() * 0.393701 / 10
 
+    def getProxInches(self, side):
+        if side == 'right':
+            return self.getProxRightInches()
+        if side == 'left':
+            return self.getProxLeftInches()
+        if side == 'front':
+            return self.getProxForwardInches()
+
     def stopRanging(self):
         self.lSensor.stop_ranging()
         self.fSensor.stop_ranging()

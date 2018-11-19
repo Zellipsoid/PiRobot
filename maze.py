@@ -1,0 +1,336 @@
+import sensors
+import servos
+import encoders
+import time
+import navigate
+
+class Maze(object):
+    def __init__(self, startPos, startDirection):
+        self.sens = sensors.Sensors()
+        self.enc = encoders.Encoders()
+        self.serv = servos.Servos()
+        self.centeredInSquareLength = 7.5
+        self.sideDistance = 7.05
+        self.distanceBetweenSquares = 18
+        self.speed = 7
+        self.detectWallDistance = 15
+        self.nav = navigate.Navigate(startPos, startDirection)
+        self.analyzeCell(True)
+
+    def isWallAhead(self):
+        return self.sens.getProxForwardInches() < self.detectWallDistance
+
+    def isWallRight(self):
+        return self.sens.getProxRightInches() < self.detectWallDistance
+
+    def isWallLeft(self):
+        return self.sens.getProxLeftInches() < self.detectWallDistance
+
+    def isListAscending(self, x, offset):
+        return [(x[k+1]-x[k]-offset)>0 for k in range(len(x)-1)].count(True) == len(x)-1
+
+    def isListDescending(self, x, offset):
+        return [(x[k+1]-x[k]+offset)<0 for k in range(len(x)-1)].count(True) == len(x)-1
+
+    def isListTrendingUp(self, x, offset):
+        # print(sum([(x[k+1]-x[k]) for k in range(len(x)-1)]) / len(x))
+        return sum([(x[k+1]-x[k]) for k in range(len(x)-1)]) / len(x) > 0 + offset
+
+    def hardTurn(self, direction):
+        omega = 2.5
+        if direction == 'right':
+            omega = -omega
+        countID = self.enc.newCount(0)
+        self.serv.setSpeedsVW(0.00001, omega)
+        while self.enc.getCounts(countID)[0] < 14:
+            pass
+        self.serv.stopServos()
+        self.centerOneDimension()
+        self.enc.deleteCount(countID)
+
+    def turn(self, direction):
+        if direction == 'left':
+            print('turning left')
+        else:
+            print('turning right')
+        sensorValues = [0, 0, 0, 0]
+        countID = self.enc.newCount(0)
+        #scan walls around, decide sensor to monitor
+        leftWall = self.isWallLeft()
+        rightWall = self.isWallRight()
+        frontWall = self.isWallAhead()
+        if frontWall and direction == 'left':
+            activeSensor = 'right'
+        elif frontWall and direction == 'right':
+            activeSensor = 'left'
+        elif leftWall and direction == 'left':
+            activeSensor = 'front'
+        elif rightWall and direction == 'right':
+            activeSensor = 'front'
+        elif rightWall or leftWall: #corresponds to rightWall and left turn, or leftWall and right turn. Basically no sensor.
+            activeSensor = 'none'
+        elif direction == 'left': #detects no walls
+            activeSensor = 'left'
+        elif direction == 'right': #detects no walls
+            activeSensor = 'right'
+        #start first part of turn, hard coded for first part
+        omega1 = 2.5
+        omega2 = 2.5
+        omega3 = 0.6
+        if direction == 'right':
+            omega1 = -omega1
+            omega2 = -omega2
+            omega3 = -omega3
+        if activeSensor != 'none':
+            # print('Initiating first stage of turning: fixed')
+            self.serv.setSpeedsVW(0.00001, omega1)
+            while self.enc.getCounts(countID)[0] < 6:
+                distance = self.sens.getProxInches(activeSensor)
+                if distance < 10:
+                    sensorValues.append(distance)
+            # print('Initiating second stage of turning: look for descending values')
+            self.serv.setSpeedsVW(0.00001, omega2)
+            while self.isListTrendingUp(sensorValues[-5:], -0.075) and self.enc.getCounts(countID)[0] < 16: #used to be -0.1
+                distance = self.sens.getProxInches(activeSensor)
+                if distance < 10:
+                    sensorValues.append(distance)
+            # print('Initiating third stage of turning: look for ascending values')
+            self.serv.setSpeedsVW(0.00001, omega3)
+            while not self.isListTrendingUp(sensorValues[-5:], 0.035):
+                distance = self.sens.getProxInches(activeSensor)
+                if distance < 10:
+                    sensorValues.append(distance)
+            # print('Found ' + str(sensorValues[-6:]))
+        else:
+            # print('Oh, no, the hard turning case!')
+            self.serv.setSpeedsVW(0.00001, omega1 / 1.5)
+            while self.enc.getCounts(countID)[0] < 15:
+                pass
+        self.serv.stopServos()
+        self.centerOneDimension()
+        self.enc.deleteCount(countID)
+        self.nav.updateHeadingInMap(direction)
+    
+    def faceDirection(self, newHeading):
+        print('turning ' + newHeading)
+        if self.nav.heading == 'n' and newHeading == 's'or self.nav.heading == 's' and newHeading == 'n' or self.nav.heading == 'e' and newHeading == 'w' or self.nav.heading == 'w' and newHeading == 'e':
+            if self.isWallLeft():
+                self.turn('left')
+                self.turn('left')
+            else:
+                self.turn('right')
+                self.turn('right')
+        elif self.nav.heading == 'n' and newHeading == 'e' or self.nav.heading == 'e' and newHeading == 's' or self.nav.heading == 's' and newHeading == 'w' or self.nav.heading == 'w' and newHeading == 'n':
+            self.turn('right')
+        elif self.nav.heading == 'n' and newHeading == 'w' or self.nav.heading == 'e' and newHeading == 'n' or self.nav.heading == 's' and newHeading == 'e' or self.nav.heading == 'w' and newHeading == 's':
+            self.turn('left')
+        else:
+            pass
+
+
+
+    def centerOneDimension(self):
+        if self.isWallAhead():
+            constantKp = 2
+            difference = 1
+            while (abs(difference) > 0.5):
+                difference = self.centeredInSquareLength - self.sens.getProxForwardInches()
+                newOutput =  -constantKp * difference #* difference
+                self.serv.setSpeedsIPS(newOutput, newOutput)
+                time.sleep(0.0025)
+            self.serv.stopServos()
+        return
+    
+    def goForward(self):
+        # self.enc.resetMainCounts()
+        countID = self.enc.newCount(0)
+        print('going straight #' + str(countID))
+        countIDstraighten = self.enc.newCount(50) #this one is to keep path straight
+        while sum(self.enc.getCountsInInches(countID)) / 2 < self.distanceBetweenSquares: 
+            left = self.sens.getProxLeftInches()
+            right = self.sens.getProxRightInches()
+            # self.centerSideWays(left, right)
+            # print(sum(self.enc.getMainCountsInInches()) / 2)
+            # if left < 10 and right < 10:
+            #     pass #stay eqidistant
+            if left < 16 and right < 16:
+                self.keepEquidistant(left, right)
+                self.enc.resetCounts(countIDstraighten)
+            elif left < 16 and left < right:
+                # print('following left')
+                self.wallFollowStraight('left')
+                self.enc.resetCounts(countIDstraighten)
+            elif right < 16 and right < left:
+                # print('following right')
+                self.wallFollowStraight('right')
+                self.enc.resetCounts(countIDstraighten)
+            else:
+                # print('straightening')
+                self.straightenPath(self.speed, self.speed, countIDstraighten)
+        self.serv.stopServos()
+        self.centerOneDimension()
+        self.enc.deleteCount(countID)
+        self.enc.deleteCount(countIDstraighten)
+        self.nav.moveForwardInMap()
+        self.analyzeCell(False)
+        self.nav.printMap()
+        return
+    def keepEquidistant(self, left, right):
+        Kp = 0.75
+        difference = min(left, right) - self.sideDistance
+        omega = difference * Kp
+        if omega > 0.5:
+            omega = 0.5
+        if left < right:
+            self.serv.setSpeedsVW(self.speed, omega)
+        elif right < left:
+            omega = -omega
+            difference = right - self.sideDistance
+            self.serv.setSpeedsVW(self.speed, omega)
+        else:
+            self.serv.setSpeedsVW(self.speed, 0)
+
+
+    def wallFollowStraight(self, side):
+        constantKp = 4
+        if side == 'left':
+            tempKp = -constantKp
+            distance = self.sens.getProxLeftInches()
+        else:
+            tempKp = constantKp
+            distance = self.sens.getProxRightInches()
+        difference = self.sideDistance - distance
+        omega =  tempKp * difference
+        if omega > 2 and distance > self.sideDistance:
+            omega = 0.15
+        elif omega > 1:
+            omega = 1
+        if omega < -2 and distance > self.sideDistance:
+            omega = -0.15
+        elif omega < -1:
+            omega = -1
+        self.serv.setSpeedsVW(self.speed, omega)
+        return
+
+    def straightenPath(self, desiredSpeedLeft, desiredSpeedRight, countID):
+        ratio = desiredSpeedLeft / desiredSpeedRight
+        ticks = self.enc.getCounts(countID)
+        if (ticks[1] != 0):
+            actualRatio = ticks[0] / ticks[1]
+        else:
+            actualRatio = 1
+        percentError = (actualRatio / ratio - 1) * 100
+        if percentError > 1.5:
+            # print("Slowing left wheel")
+            differential = desiredSpeedRight * 0.5
+            self.serv.setSpeedsIPS(desiredSpeedLeft - differential, desiredSpeedRight + differential)
+        elif percentError < -1.5:
+            # print("Slowing right wheel")
+            differential = desiredSpeedLeft * 0.5
+            self.serv.setSpeedsIPS(desiredSpeedLeft + differential, desiredSpeedRight - differential)
+        else:
+            self.serv.setSpeedsIPS(desiredSpeedLeft, desiredSpeedRight)
+            if (ticks[0] > 100 or ticks[1] > 100):
+                self.enc.subtractCounts(countID, 25)
+
+    def centerTwoDimensions(self):
+        self.centerOneDimension()
+        if self.isWallLeft():
+            self.turn('left')
+            self.centerOneDimension()
+            self.turn('right')
+        elif self.isWallRight():
+            self.turn('right')
+            self.centerOneDimension()
+            self.turn('left')
+        # else:
+            # print('no wall to the side')
+
+    def centerSideWays(self, left, right):
+        if left < 4.5:
+            self.turn('left')
+            self.centerOneDimension()
+            self.turn('right')
+        elif right < 4.5:
+            self.turn('right')
+            self.centerOneDimension()
+            self.turn('left')
+        # else:
+            # print('already in center of lane')
+        return
+    # def printMap(self):
+    #     # self.nav.discoverCell(self.nav.map[1][1])
+    #     self.nav.printMap()
+
+    # def face(self, directin): #MAKE THIS
+
+    def analyzeCell(self, first): #must be called after going forward or at start
+        if not first:
+            self.nav.addCellToMap(not self.isWallAhead(), not self.isWallRight(), True, not self.isWallLeft()) #front, right, behind, left
+        else:
+            if self.isWallRight(): #tries to avoid blind turn
+                self.turn('right')
+                back = not self.isWallRight()
+                self.turn('left')
+            else:
+                self.turn('left')
+                back = not self.isWallLeft()
+                self.turn('right')
+            self.nav.addCellToMap(not self.isWallAhead(), not self.isWallRight(), back, not self.isWallLeft())
+            self.nav.printMap()
+
+    def goToNextCell(self):
+        discovered = self.nav.getDiscoveredCells()
+        if len(discovered) > 0:
+            self.faceDirection(self.nav.getCellDirection(discovered[-1]))
+            self.nav.pushCurrentCellToStack()
+            self.goForward()
+            return True
+        elif len(discovered) == 0 and len(self.nav.cellStack) > 0:
+            # self.faceDirection(self.nav.getCellDirection(self.nav.cellStack.pop()))
+            # self.goForward()
+            self.goToCell(self.nav.expressPop())
+            return True
+        else:
+            return False
+
+    def waveNumberCells(self, goalCell, number): #start with 0
+        if self.nav.map[goalCell.y][goalCell.x].waveNumber > number:
+            self.nav.map[goalCell.y][goalCell.x].waveNumber = number
+            if self.nav.map[goalCell.y][goalCell.x].north != None:
+                self.waveNumberCells(self.nav.map[goalCell.y][goalCell.x].north, number + 1)
+            if self.nav.map[goalCell.y][goalCell.x].east != None:
+                self.waveNumberCells(self.nav.map[goalCell.y][goalCell.x].east, number + 1)
+            if self.nav.map[goalCell.y][goalCell.x].south != None:
+                self.waveNumberCells(self.nav.map[goalCell.y][goalCell.x].south, number + 1)
+            if self.nav.map[goalCell.y][goalCell.x].west != None:
+                self.waveNumberCells(self.nav.map[goalCell.y][goalCell.x].west, number + 1)
+
+    def clearWaveNumbers(self):
+        for x in range(4):
+            for y in range(4):
+                self.nav.map[y][x].waveNumber = 16
+
+    def FollowWaveNumbers(self):
+        targetWaveNumber = 16
+        while self.nav.map[self.nav.pos[1]][self.nav.pos[0]].waveNumber != 0:
+            if self.nav.map[self.nav.pos[1]][self.nav.pos[0]].north:
+                targetCell = self.nav.map[self.nav.pos[1]][self.nav.pos[0]].north
+                targetWaveNumber = self.nav.map[self.nav.pos[1]][self.nav.pos[0]].north.waveNumber
+            if self.nav.map[self.nav.pos[1]][self.nav.pos[0]].east and self.nav.map[self.nav.pos[1]][self.nav.pos[0]].east.waveNumber < targetWaveNumber:
+                targetCell = self.nav.map[self.nav.pos[1]][self.nav.pos[0]].east
+                targetWaveNumber = self.nav.map[self.nav.pos[1]][self.nav.pos[0]].east.waveNumber
+            if self.nav.map[self.nav.pos[1]][self.nav.pos[0]].south and self.nav.map[self.nav.pos[1]][self.nav.pos[0]].south.waveNumber < targetWaveNumber:
+                targetCell = self.nav.map[self.nav.pos[1]][self.nav.pos[0]].south
+                targetWaveNumber = self.nav.map[self.nav.pos[1]][self.nav.pos[0]].south.waveNumber
+            if self.nav.map[self.nav.pos[1]][self.nav.pos[0]].west and self.nav.map[self.nav.pos[1]][self.nav.pos[0]].west.waveNumber < targetWaveNumber:
+                targetCell = self.nav.map[self.nav.pos[1]][self.nav.pos[0]].west
+                targetWaveNumber = self.nav.map[self.nav.pos[1]][self.nav.pos[0]].west.waveNumber
+            self.faceDirection(self.nav.getCellDirection(targetCell))
+            self.goForward()
+
+    def goToCell(self, goal):
+        self.waveNumberCells(goal, 0)
+        self.FollowWaveNumbers()
+        self.clearWaveNumbers()
+

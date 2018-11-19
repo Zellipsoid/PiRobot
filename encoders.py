@@ -15,8 +15,8 @@ class Encoders(object):
     def __init__(self):
         self.velArrayRight = []
         self.velArrayLeft = []
-        self.rightTicks = 0
-        self.leftTicks = 0
+        self.counters = []
+        self.counterCount = 0 #number of count instances made so far
         self.startTime = time.time()
         self.speedRecord = 2 #number of values to record in record of speed. Min val is 2. Bigger values are less instantaneous but more reliable.
         self.notMovingTimeout = 1 # time in s before declared as not moving if no encoders ticked. The smaller the value, the less accurate but the higher the response time.
@@ -46,12 +46,15 @@ class Encoders(object):
         GPIO.add_event_detect(LENCODER, GPIO.RISING, self.onLeftEncode)
         GPIO.add_event_detect(RENCODER, GPIO.RISING, self.onRightEncode)
         
+
+        #LEGACY DATA - these are just kept so that old code will run. Avoid using them in the future.
+        self.rightTicks = 0
+        self.leftTicks = 0
     # This function is called when the left encoder detects a rising edge signal.
-    def getWheelsDiameter(self):
-        return self.wheelsDiameter
     def onLeftEncode(self, pin):
         #print("Left encoder ticked!")
         self.leftTicks += 1
+        self.incrementAllCounts('left')
         self.velArrayLeft.append((time.time(), self.leftTicks))
         if (len(self.velArrayLeft) > self.speedRecord):
             self.velArrayLeft = self.velArrayLeft[1:(self.speedRecord + 1)]
@@ -63,6 +66,7 @@ class Encoders(object):
     def onRightEncode(self, pin):
         #print("Right encoder ticked!")
         self.rightTicks += 1
+        self.incrementAllCounts('right')
         self.velArrayRight.append((time.time(), self.rightTicks))
         if (len(self.velArrayRight) > self.speedRecord):
             self.velArrayRight = self.velArrayRight[1:(self.speedRecord + 1)]
@@ -70,25 +74,45 @@ class Encoders(object):
             self.wheelTicksRight += 1
             self.calibrationArrayRight.append(self.getSpeeds()[1]) #append current right speed to array
 
-    def resetCounts(self):
-        self.rightTicks = 0
-        self.leftTicks = 0
+    def incrementAllCounts(self, side):
+        for count in self.counters:
+            count[side] += 1
 
-    def subtractCounts(self, sub): # will increase accuracy
-        self.rightTicks -= sub
-        self.leftTicks -= sub
+    def newCount(self, base):
+        number = self.counterCount
+        self.counterCount += 1
+        self.counters.append({'number': number, 'left': base, 'right': base, 'base': base})
+        return number
+
+    def resetCounts(self, number):
+        for count in self.counters:
+            if count['number'] == number:
+                count['left'] = count['base']
+                count['right'] = count['base']
+                break
+
+    def subtractCounts(self, number, sub):
+        for count in self.counters:
+            if count['number'] == number:
+                count['left'] -= sub
+                count['right'] -= sub
+                break
         
     def resetTime(self):
         self.startTime = time.time()
 
-    def getCounts(self):
-        return (self.leftTicks, self.rightTicks)
+    def getCounts(self, number):
+        for count in self.counters:
+            if count['number'] == number:
+                return (count['left'], count['right'])
 
-    def getDistanceTraveledRPS(self):
-        return (self.leftTicks / 32, self.rightTicks / 32)
+    def deleteCount(self, number):
+        self.counters = [x for x in self.counters if x['number'] != number]
     
-    def getDistanceTraveledIPS(self):
-        return (self.leftTicks / 32 * self.wheelsDiameter * math.pi, self.rightTicks / 32 * self.wheelsDiameter * math.pi)
+    def getCountsInInches(self, number):
+        for count in self.counters:
+            if count['number'] == number:
+                return (count['left'] / 32 * self.wheelsDiameter * math.pi, count['right'] / 32 * self.wheelsDiameter * math.pi)
 
     def getSpeeds(self):
         totalTime = self.getElapsedTime()
@@ -237,3 +261,21 @@ class Encoders(object):
         self.wheelTicksLeft = 0
         self.wheelTicksRight = 0
 
+    #LEGACY FUNCTIONS - these are just kept so that old code will run. Avoid using them in the future.
+    def resetMainCounts(self):
+        self.rightTicks = 0
+        self.leftTicks = 0
+
+    def subtractMainCounts(self, sub): # will increase accuracy
+        self.rightTicks -= sub
+        self.leftTicks -= sub
+
+    def getMainCounts(self):
+        return (self.leftTicks, self.rightTicks)
+
+    def getMainCountsInInches(self):
+        return (self.leftTicks / 32 * self.wheelsDiameter * math.pi, self.rightTicks / 32 * self.wheelsDiameter * math.pi)
+
+    def getDistanceTraveledRPS(self):
+        return (self.leftTicks / 32, self.rightTicks / 32)
+    
