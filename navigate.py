@@ -54,6 +54,18 @@ class Navigate(object):
             rotations = 1
         return walls[rotations:] + walls[:rotations]
         
+    def howManyTurnsToFace(self, currentDirection):
+        if self.heading == 'n' and currentDirection == 's':
+            rotations = 2
+        elif self.heading == 's' and currentDirection == 'n':
+            rotations = 2
+        elif self.heading == 'e' and currentDirection == 'w':
+            rotations = 2
+        elif self.heading == 'w' and currentDirection == 'e':
+            rotations = 2
+        else:
+            rotations = 1
+        return rotations
 
     def moveForwardInMap(self):
         if self.heading == 'n':
@@ -161,6 +173,33 @@ class Navigate(object):
             discoveredList.append(self.map[self.pos[1]][self.pos[0]].west)
             
         return discoveredList
+
+
+    def getNeighbors(self):
+        neighborList = []
+
+        #if not facing that direction
+        if not self.heading == 'n' and self.map[self.pos[1]][self.pos[0]].north:
+            neighborList.append(self.map[self.pos[1]][self.pos[0]].north)
+        if not self.heading == 'e' and self.map[self.pos[1]][self.pos[0]].east:
+            neighborList.append(self.map[self.pos[1]][self.pos[0]].east)
+        if not self.heading == 's' and self.map[self.pos[1]][self.pos[0]].south:
+            neighborList.append(self.map[self.pos[1]][self.pos[0]].south)
+        if not self.heading == 'w' and self.map[self.pos[1]][self.pos[0]].west:
+            neighborList.append(self.map[self.pos[1]][self.pos[0]].west)
+
+        #if facing that direction, should be added last because stack top is in back
+        if self.heading == 'n' and self.map[self.pos[1]][self.pos[0]].north:
+            neighborList.append(self.map[self.pos[1]][self.pos[0]].north)
+        if self.heading == 'e' and self.map[self.pos[1]][self.pos[0]].east:
+            neighborList.append(self.map[self.pos[1]][self.pos[0]].east)
+        if self.heading == 's' and self.map[self.pos[1]][self.pos[0]].south:
+            neighborList.append(self.map[self.pos[1]][self.pos[0]].south)
+        if self.heading == 'w' and self.map[self.pos[1]][self.pos[0]].west:
+            neighborList.append(self.map[self.pos[1]][self.pos[0]].west)
+            
+        return neighborList
+
 
     def hasUnexploredNeighbors(self, cell):
         unexplored = False

@@ -28,8 +28,7 @@ if heading != 'n' and heading != 's' and heading != 'e' and heading != 'w':
     sys.exit('Error: heading must be N, E, S, or W')
 if pos[0] > 3 or pos[0] < 0 or pos[1] > 3 or pos[1] < 0:
     sys.exit('Error: positions must be 0, 1, 2, or 3')
-printMap = True
-mz = maze.Maze(pos, heading, printMap)
+mz = maze.Maze(pos, heading)
 
 # mz.goForward()
 # mz.goForward()

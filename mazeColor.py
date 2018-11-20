@@ -89,8 +89,7 @@ options = {'color': 'unknown', 'readyToMap': False, 'pos': (-1, -1), 'heading': 
 while options['pos'] == (-1, -1) or options['heading'] == 'unknown': #make sure has position
     options = mainMenu(options)
 
-printMap = True
-mz = maze.Maze(options['pos'], options['heading'], printMap)
+mz = maze.Maze(options['pos'], options['heading'])
 
 while True: #now can choose any option
     if options['readyToMap'] == True:
