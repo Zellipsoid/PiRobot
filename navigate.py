@@ -12,19 +12,18 @@ class Node:
         self.discovered = False
         self.miniMap = [['x', 'x', 'x', 'x'], ['x', ' ', ' ', ' '], ['x', ' ', '?', ' '], ['x', ' ', ' ', ' ']]
         self.waveNumber = 16 #highest number is 15, 16 is not mapped
-
+        
 class Navigate(object):
     def __init__(self, startPos, startDirection):
         self.cellStack = []
         self.heading = startDirection
         # base = {'explored': False}
-        base = Node(False, False, False, False, startPos[0], startPos[1])
-        # self.map = [[base, base, base, base],[base, base, base, base],[base, base, base, base],[base, base, base, base]]
         self.map = [[None, None, None, None], [None, None, None, None], [None, None, None, None], [None, None, None, None]]
         for y in range(0, 4):
             for x in range (0, 4):
                 self.map[y][x] = Node(None, None, None, None, x, y)
         self.pos = startPos # is a list with length 2, [0, 0]
+        self.mapComplete = False
     def updateHeadingInMap(self, direction):
         #Change stored direction
         if direction == 'right' and self.heading == 'n':
@@ -163,6 +162,18 @@ class Navigate(object):
             
         return discoveredList
 
+    def hasUnexploredNeighbors(self, cell):
+        unexplored = False
+        if (cell.north and cell.north.explored == False):
+            unexplored = True
+        elif (cell.east and cell.east.explored == False):
+            unexplored = True
+        elif (cell.south and cell.south.explored == False):
+            unexplored = True
+        elif (cell.west and cell.west.explored == False):
+            unexplored = True
+        return unexplored
+
     def getCellDirection(self, cell):
         if cell == self.map[self.pos[1]][self.pos[0]].north:
             return 'n'
@@ -185,4 +196,11 @@ class Navigate(object):
             cell = self.cellStack.pop()
         return cell
         
+    def clearMap(self, pos, heading):
+        self.map = [[None, None, None, None], [None, None, None, None], [None, None, None, None], [None, None, None, None]]
+        for y in range(0, 4):
+            for x in range (0, 4):
+                self.map[y][x] = Node(None, None, None, None, x, y)
+        self.pos = pos
+        self.heading = heading
         

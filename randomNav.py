@@ -17,18 +17,7 @@ def ctrlC(signum, frame):
     exit()
 signal.signal(signal.SIGINT, ctrlC)
 
-if len(sys.argv) != 4:
-    sys.exit('Error: navigateMaze.py requires 3 arguments: x position, y position, and heading')
-try:
-    pos = [int(sys.argv[1]), int(sys.argv[2])]
-except ValueError:
-    sys.exit('Error: arguments must be integers: x position, y position')
-heading = str(sys.argv[3].lower())
-if heading != 'n' and heading != 's' and heading != 'e' and heading != 'w':
-    sys.exit('Error: heading must be N, E, S, or W')
-if pos[0] > 3 or pos[0] < 0 or pos[1] > 3 or pos[1] < 0:
-    sys.exit('Error: positions must be 0, 1, 2, or 3')
-printMap = True
+let printMap = False
 mz = maze.Maze(pos, heading, printMap)
 
 # mz.goForward()

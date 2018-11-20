@@ -15,7 +15,9 @@ class Maze(object):
         self.speed = 7
         self.detectWallDistance = 15
         self.nav = navigate.Navigate(startPos, startDirection)
-        self.analyzeCell(True)
+
+    # def __del__(self):
+    #     del self.nav
 
     def isWallAhead(self):
         return self.sens.getProxForwardInches() < self.detectWallDistance
@@ -103,8 +105,8 @@ class Maze(object):
             # print('Found ' + str(sensorValues[-6:]))
         else:
             # print('Oh, no, the hard turning case!')
-            self.serv.setSpeedsVW(0.00001, omega1 / 1.5)
-            while self.enc.getCounts(countID)[0] < 15:
+            self.serv.setSpeedsVW(0.00001, omega3 * 1.3)
+            while (self.enc.getCounts(countID)[0] + self.enc.getCounts(countID)[1]) < 29:
                 pass
         self.serv.stopServos()
         self.centerOneDimension()
@@ -271,11 +273,11 @@ class Maze(object):
             if self.isWallRight(): #tries to avoid blind turn
                 self.turn('right')
                 back = not self.isWallRight()
-                self.turn('left')
+                # self.turn('left')
             else:
                 self.turn('left')
                 back = not self.isWallLeft()
-                self.turn('right')
+                # self.turn('right')
             self.nav.addCellToMap(not self.isWallAhead(), not self.isWallRight(), back, not self.isWallLeft())
             self.nav.printMap()
 
@@ -287,11 +289,15 @@ class Maze(object):
             self.goForward()
             return True
         elif len(discovered) == 0 and len(self.nav.cellStack) > 0:
-            # self.faceDirection(self.nav.getCellDirection(self.nav.cellStack.pop()))
-            # self.goForward()
-            self.goToCell(self.nav.expressPop())
+            nextCell = self.nav.expressPop()
+            if self.nav.hasUnexploredNeighbors(nextCell): #get rid of this if/else statement to make it go back to starting cell
+                self.goToCell(nextCell)
+            else:
+                self.nav.mapComplete = True
+                return False
             return True
         else:
+            self.nav.mapComplete = True
             return False
 
     def waveNumberCells(self, goalCell, number): #start with 0
