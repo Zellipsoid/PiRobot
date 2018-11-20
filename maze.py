@@ -155,10 +155,10 @@ class Maze(object):
             # print(sum(self.enc.getMainCountsInInches()) / 2)
             # if left < 10 and right < 10:
             #     pass #stay eqidistant
-            if left < 16 and right < 16:
-                self.keepEquidistant(left, right)
-                self.enc.resetCounts(countIDstraighten)
-            elif left < 16 and left < right:
+            # if left < 16 and right < 16:
+            #     self.keepEquidistant(left, right)
+            #     self.enc.resetCounts(countIDstraighten)
+            if left < 16 and left < right:
                 # print('following left')
                 self.wallFollowStraight('left')
                 self.enc.resetCounts(countIDstraighten)

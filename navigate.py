@@ -12,6 +12,7 @@ class Node:
         self.discovered = False
         self.miniMap = [['x', 'x', 'x', 'x'], ['x', ' ', ' ', ' '], ['x', ' ', '?', ' '], ['x', ' ', ' ', ' ']]
         self.waveNumber = 16 #highest number is 15, 16 is not mapped
+        self.color = 'unknown'
         
 class Navigate(object):
     def __init__(self, startPos, startDirection):
