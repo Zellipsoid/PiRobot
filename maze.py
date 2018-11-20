@@ -3,9 +3,11 @@ import servos
 import encoders
 import time
 import navigate
+import camera
 
 class Maze(object):
     def __init__(self, startPos, startDirection):
+        self.cam = camera.Camera()
         self.sens = sensors.Sensors()
         self.enc = encoders.Encoders()
         self.serv = servos.Servos()
@@ -15,9 +17,15 @@ class Maze(object):
         self.speed = 7
         self.detectWallDistance = 15
         self.nav = navigate.Navigate(startPos, startDirection)
+        self.useColor = False
+        self.colorList = []
+        self.foundColorList = []
 
     # def __del__(self):
     #     del self.nav
+    def enableColor(self, colorList):
+        self.useColor = True
+        self.colorList = colorList
 
     def isWallAhead(self):
         return self.sens.getProxForwardInches() < self.detectWallDistance
@@ -175,6 +183,8 @@ class Maze(object):
         self.enc.deleteCount(countIDstraighten)
         self.nav.moveForwardInMap()
         self.analyzeCell(False)
+        if self.useColor:
+            self.checkColor()
         self.nav.printMap()
         return
     def keepEquidistant(self, left, right):
@@ -270,16 +280,48 @@ class Maze(object):
         if not first:
             self.nav.addCellToMap(not self.isWallAhead(), not self.isWallRight(), True, not self.isWallLeft()) #front, right, behind, left
         else:
+            wallAhead = self.isWallAhead()
+            wallRight = self.isWallRight()
+            wallLeft = self.isWallLeft()
             if self.isWallRight(): #tries to avoid blind turn
                 self.turn('right')
                 back = not self.isWallRight()
-                # self.turn('left')
+                self.turn('left')
             else:
                 self.turn('left')
                 back = not self.isWallLeft()
-                # self.turn('right')
-            self.nav.addCellToMap(not self.isWallAhead(), not self.isWallRight(), back, not self.isWallLeft())
+                self.turn('right')
+            self.nav.addCellToMap(not wallAhead, not wallRight, back, not wallLeft)
             self.nav.printMap()
+
+    def checkColor(self):
+        if len(self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors) == 0 and len(self.foundColorList) != len(self.colorList):
+            if self.nav.pos[1] == 3:
+                print('FACING NORTH')
+                self.faceDirection('n')
+                self.checkAgainstColorList()
+            if self.nav.pos[1] == 0:
+                print('FACING SOUTH')
+                self.faceDirection('s')
+                self.checkAgainstColorList()
+            if self.nav.pos[0] == 0:
+                print('FACING WEST')
+                self.faceDirection('w')
+                self.checkAgainstColorList()
+            if self.nav.pos[0] == 3:
+                print('FACING EAST')
+                self.faceDirection('e')
+                self.checkAgainstColorList()
+
+    def checkAgainstColorList(self): #called in the above function
+        for color in self.colorList:
+                stats = self.cam.getBlobStatsColored(color)
+                if stats['totalArea'] > 100000:
+                    self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors.append(color['name'])
+                    self.foundColorList.append(color)
+                    self.nav.addColorToCell(color['name'])
+
+        
 
     def goToNextCell(self):
         discovered = self.nav.getDiscoveredCells()

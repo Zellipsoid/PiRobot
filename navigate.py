@@ -12,7 +12,7 @@ class Node:
         self.discovered = False
         self.miniMap = [['x', 'x', 'x', 'x'], ['x', ' ', ' ', ' '], ['x', ' ', '?', ' '], ['x', ' ', ' ', ' ']]
         self.waveNumber = 16 #highest number is 15, 16 is not mapped
-        self.color = 'unknown'
+        self.colors = []
         
 class Navigate(object):
     def __init__(self, startPos, startDirection):
@@ -96,7 +96,8 @@ class Navigate(object):
                 print(self.map[y][x].miniMap[2][0], end="")
                 print(self.map[y][x].miniMap[2][1], end="")
                 print(self.map[y][x].miniMap[2][2], end="")
-                self.map[y][x].miniMap[2][2] = ' '
+                if self.map[y][x].miniMap[2][2] == 'R':
+                    self.map[y][x].miniMap[2][2] = ' '
                 print(self.map[y][x].miniMap[2][3], end="")
             print('x')
             for x in range (0, 4):
@@ -112,8 +113,9 @@ class Navigate(object):
         print(self.pos)
 
     def addCellToMap(self, front, right, back, left):
+        # print([front, right, back, left])
         wallArray = self.orientSensorReadings([front, right, back, left])
-        print(wallArray)
+        # print(wallArray)
         # self.map[self.pos[1]][self.pos[0]].north = wallArray[0]
         # self.map[self.pos[1]][self.pos[0]].east = wallArray[1]
         # self.map[self.pos[1]][self.pos[0]].south = wallArray[2]
@@ -139,9 +141,9 @@ class Navigate(object):
             self.map[self.pos[1]][self.pos[0] + 1].miniMap[2][0] = ' '
             self.map[self.pos[1]][self.pos[0] + 1].miniMap[3][0] = ' '
         if wallArray[3] and self.pos[0] > 0:
-            self.map[self.pos[1]][self.pos[0]].miniMap[3][1] = ' '
-            self.map[self.pos[1]][self.pos[0]].miniMap[3][2] = ' '
-            self.map[self.pos[1]][self.pos[0]].miniMap[3][3] = ' '
+            self.map[self.pos[1]][self.pos[0]].miniMap[1][0] = ' '
+            self.map[self.pos[1]][self.pos[0]].miniMap[2][0] = ' '
+            self.map[self.pos[1]][self.pos[0]].miniMap[3][0] = ' '
             self.map[self.pos[1]][self.pos[0]].west = self.map[self.pos[1]][self.pos[0] - 1]
             self.discoverCell(self.map[self.pos[1]][self.pos[0] - 1])
 
@@ -243,4 +245,21 @@ class Navigate(object):
                 self.map[y][x] = Node(None, None, None, None, x, y)
         self.pos = pos
         self.heading = heading
-        
+
+    def findColor(self, color): #temporary
+        for y in range(0, 4):
+            for x in range (0, 4):
+                if color in self.map[y][x].colors:
+                    return self.map[y][x]
+
+    def addColorToCell(self, color):
+        if len(self.map[self.pos[1]][self.pos[0]].colors) == 0:
+            self.map[self.pos[1]][self.pos[0]].miniMap[3][3] = color[0]
+            self.map[self.pos[1]][self.pos[0]].miniMap[1][1] = color[0]
+            self.map[self.pos[1]][self.pos[0]].miniMap[1][3] = color[0]
+            self.map[self.pos[1]][self.pos[0]].miniMap[3][1] = color[0]
+        else:
+            self.map[self.pos[1]][self.pos[0]].miniMap[2][1] = color[0]
+            self.map[self.pos[1]][self.pos[0]].miniMap[2][3] = color[0]
+            self.map[self.pos[1]][self.pos[0]].miniMap[1][2] = color[0]
+            self.map[self.pos[1]][self.pos[0]].miniMap[3][2] = color[0]

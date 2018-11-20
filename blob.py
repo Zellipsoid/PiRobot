@@ -28,15 +28,15 @@ WINDOW2 = "Detected Blobs - Press Esc to quit"
 # minH =   0; minS = 127; minV =   0
 # maxH = 180; maxS = 255; maxV = 255
 #Zachary's red trash can
-minH =   169; minS = 105; minV =   41
-maxH = 179; maxS = 194; maxV = 76
+# minH =   169; minS = 105; minV =   41
+# maxH = 179; maxS = 194; maxV = 76
 #Zachary's house test
 # minH =   169; minS = 109; minV =   56
 # maxH = 180; maxS = 235; maxV = 135
 
 #C4 Pink Goal
-# minH =   152; minS = 120; minV =   85
-# maxH = 174; maxS = 255; maxV = 255
+minH =   152; minS = 120; minV =   85
+maxH = 180; maxS = 255; maxV = 255
 
 # These functions are called when the user moves a trackbar
 def onMinHTrackbar(val):

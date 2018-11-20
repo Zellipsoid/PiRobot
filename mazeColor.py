@@ -5,6 +5,12 @@ import maze
 import servos
 import sys
 
+
+#colors
+colorList = []
+testRed = {'minH': 169, 'maxH': 180, 'minS': 124, 'maxS': 180, 'minV': 32, 'maxV': 103, 'name': 'pink'}
+colorList.append(testRed)
+# testBrown = {minH: 169, maxH: 180, minS: 124, maxS: 180, minV: 32, maxV: 103, name: 'pink'}
 #objects for servos, encoders, sensors, and camera
 serv = servos.Servos()
 
@@ -90,6 +96,7 @@ while options['pos'] == (-1, -1) or options['heading'] == 'unknown': #make sure 
     options = mainMenu(options)
 
 mz = maze.Maze(options['pos'], options['heading'])
+mz.enableColor(colorList)
 
 while True: #now can choose any option
     if options['readyToMap'] == True:
@@ -103,7 +110,7 @@ while True: #now can choose any option
         options['mapped'] = True
 
     if options['color'] != 'unknown':
-        print('not ready yet :(')
+        mz.goToCell(mz.nav.findColor(options['color']))
         options['color'] = 'unknown'
     options = mainMenu(options)
     print(options)
