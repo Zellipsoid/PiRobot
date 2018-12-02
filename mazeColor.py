@@ -8,9 +8,20 @@ import sys
 
 #colors
 colorList = []
-testRed = {'minH': 169, 'maxH': 180, 'minS': 124, 'maxS': 180, 'minV': 32, 'maxV': 103, 'name': 'pink'}
-colorList.append(testRed)
-# testBrown = {minH: 169, maxH: 180, minS: 124, maxS: 180, minV: 32, maxV: 103, name: 'pink'}
+# testRed = {'minH': 169, 'maxH': 180, 'minS': 124, 'maxS': 180, 'minV': 32, 'maxV': 103, 'name': 'pink'}
+# colorList.append(testRed)
+pink = {'minH': 152, 'minS': 120, 'minV': 85, 'maxH': 180, 'maxS': 255, 'maxV': 255, 'name': 'pink'}
+colorList.append(pink)
+
+yellow = {'minH': 20, 'minS': 125, 'minV': 65, 'maxH': 33, 'maxS': 202, 'maxV': 177, 'name': 'yellow'}
+colorList.append(yellow)
+
+green = {'minH': 44, 'minS': 140, 'minV': 83, 'maxH': 57, 'maxS': 206, 'maxV': 169, 'name': 'green'}
+colorList.append(green)
+
+# blue = {'minH': 0, 'minS': 0, 'minV': 52, 'maxH': 111, 'maxS': 58, 'maxV': 207, 'name': 'blue'}
+blue = {'minH': 69, 'minS': 0, 'minV': 135, 'maxH': 91, 'maxS': 32, 'maxV': 163, 'name': 'blue'}
+colorList.append(blue)
 #objects for servos, encoders, sensors, and camera
 serv = servos.Servos()
 

@@ -47,16 +47,17 @@ class Maze(object):
         return sum([(x[k+1]-x[k]) for k in range(len(x)-1)]) / len(x) > 0 + offset
 
     def hardTurn(self, direction):
-        omega = 2.5
+        omega = 2
         if direction == 'right':
             omega = -omega
         countID = self.enc.newCount(0)
         self.serv.setSpeedsVW(0.00001, omega)
-        while self.enc.getCounts(countID)[0] < 14:
+        while (self.enc.getCounts(countID)[0] + self.enc.getCounts(countID)[1]) < 29:
             pass
         self.serv.stopServos()
         self.centerOneDimension()
         self.enc.deleteCount(countID)
+        self.nav.updateHeadingInMap(direction)
 
     def turn(self, direction):
         if direction == 'left':
@@ -94,7 +95,7 @@ class Maze(object):
         if activeSensor != 'none':
             # print('Initiating first stage of turning: fixed')
             self.serv.setSpeedsVW(0.00001, omega1)
-            while self.enc.getCounts(countID)[0] < 6:
+            while self.enc.getCounts(countID)[0] < 10: #used to be 6
                 distance = self.sens.getProxInches(activeSensor)
                 if distance < 10:
                     sensorValues.append(distance)
@@ -121,21 +122,32 @@ class Maze(object):
         self.enc.deleteCount(countID)
         self.nav.updateHeadingInMap(direction)
     
-    def faceDirection(self, newHeading):
+    def faceDirection(self, newHeading, turnType):
         print('turning ' + newHeading)
-        if self.nav.heading == 'n' and newHeading == 's'or self.nav.heading == 's' and newHeading == 'n' or self.nav.heading == 'e' and newHeading == 'w' or self.nav.heading == 'w' and newHeading == 'e':
-            if self.isWallLeft():
-                self.turn('left')
-                self.turn('left')
-            else:
+        if turnType == 'sensor':
+            if self.nav.heading == 'n' and newHeading == 's'or self.nav.heading == 's' and newHeading == 'n' or self.nav.heading == 'e' and newHeading == 'w' or self.nav.heading == 'w' and newHeading == 'e':
+                if self.isWallLeft():
+                    self.turn('left')
+                    self.turn('left')
+                else:
+                    self.turn('right')
+                    self.turn('right')
+            elif self.nav.heading == 'n' and newHeading == 'e' or self.nav.heading == 'e' and newHeading == 's' or self.nav.heading == 's' and newHeading == 'w' or self.nav.heading == 'w' and newHeading == 'n':
                 self.turn('right')
-                self.turn('right')
-        elif self.nav.heading == 'n' and newHeading == 'e' or self.nav.heading == 'e' and newHeading == 's' or self.nav.heading == 's' and newHeading == 'w' or self.nav.heading == 'w' and newHeading == 'n':
-            self.turn('right')
-        elif self.nav.heading == 'n' and newHeading == 'w' or self.nav.heading == 'e' and newHeading == 'n' or self.nav.heading == 's' and newHeading == 'e' or self.nav.heading == 'w' and newHeading == 's':
-            self.turn('left')
+            elif self.nav.heading == 'n' and newHeading == 'w' or self.nav.heading == 'e' and newHeading == 'n' or self.nav.heading == 's' and newHeading == 'e' or self.nav.heading == 'w' and newHeading == 's':
+                self.turn('left')
         else:
-            pass
+            if self.nav.heading == 'n' and newHeading == 's'or self.nav.heading == 's' and newHeading == 'n' or self.nav.heading == 'e' and newHeading == 'w' or self.nav.heading == 'w' and newHeading == 'e':
+                if self.isWallLeft():
+                    self.hardTurn('left')
+                    self.hardTurn('left')
+                else:
+                    self.hardTurn('right')
+                    self.hardTurn('right')
+            elif self.nav.heading == 'n' and newHeading == 'e' or self.nav.heading == 'e' and newHeading == 's' or self.nav.heading == 's' and newHeading == 'w' or self.nav.heading == 'w' and newHeading == 'n':
+                self.hardTurn('right')
+            elif self.nav.heading == 'n' and newHeading == 'w' or self.nav.heading == 'e' and newHeading == 'n' or self.nav.heading == 's' and newHeading == 'e' or self.nav.heading == 'w' and newHeading == 's':
+                self.hardTurn('left')
 
 
 
@@ -292,41 +304,48 @@ class Maze(object):
                 back = not self.isWallLeft()
                 self.turn('right')
             self.nav.addCellToMap(not wallAhead, not wallRight, back, not wallLeft)
+            self.checkColor() #CAN DO THIS WAY BETTER, NO NEED FOR EXTRA TURNS todo
             self.nav.printMap()
 
     def checkColor(self):
-        if len(self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors) == 0 and len(self.foundColorList) != len(self.colorList):
+        if len(self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors) == 0 and len(self.foundColorList) != len(self.colorList) and 'none' not in self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors:
             if self.nav.pos[1] == 3:
                 print('FACING NORTH')
-                self.faceDirection('n')
+                self.faceDirection('n', 'hard')
                 self.checkAgainstColorList()
             if self.nav.pos[1] == 0:
                 print('FACING SOUTH')
-                self.faceDirection('s')
+                self.faceDirection('s', 'hard')
                 self.checkAgainstColorList()
             if self.nav.pos[0] == 0:
                 print('FACING WEST')
-                self.faceDirection('w')
+                self.faceDirection('w', 'hard')
                 self.checkAgainstColorList()
             if self.nav.pos[0] == 3:
                 print('FACING EAST')
-                self.faceDirection('e')
+                self.faceDirection('e', 'hard')
                 self.checkAgainstColorList()
 
     def checkAgainstColorList(self): #called in the above function
+        addNoColorFlag = True
         for color in self.colorList:
                 stats = self.cam.getBlobStatsColored(color)
                 if stats['totalArea'] > 100000:
                     self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors.append(color['name'])
                     self.foundColorList.append(color)
                     self.nav.addColorToCell(color['name'])
+                    addNoColorFlag = False
+                    #HERE, should mark whole row as no color todo
+        if addNoColorFlag:
+            self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors.append('none')
+
 
         
 
     def goToNextCell(self):
         discovered = self.nav.getDiscoveredCells()
         if len(discovered) > 0:
-            self.faceDirection(self.nav.getCellDirection(discovered[-1]))
+            self.faceDirection(self.nav.getCellDirection(discovered[-1]), 'sensor')
             self.nav.pushCurrentCellToStack()
             self.goForward()
             return True
@@ -374,7 +393,7 @@ class Maze(object):
             if self.nav.map[self.nav.pos[1]][self.nav.pos[0]].west and self.nav.map[self.nav.pos[1]][self.nav.pos[0]].west.waveNumber < targetWaveNumber:
                 targetCell = self.nav.map[self.nav.pos[1]][self.nav.pos[0]].west
                 targetWaveNumber = self.nav.map[self.nav.pos[1]][self.nav.pos[0]].west.waveNumber
-            self.faceDirection(self.nav.getCellDirection(targetCell))
+            self.faceDirection(self.nav.getCellDirection(targetCell), 'sensor')
             self.goForward()
 
     def goToCell(self, goal):
