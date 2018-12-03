@@ -20,11 +20,20 @@ class Maze(object):
         self.useColor = False
         self.colorList = []
         self.foundColorList = []
+        self.foundColorNorth = False
+        self.foundColorEast = False
+        self.foundColorSouth = False
+        self.foundColorWest = False
 
     # def __del__(self):
     #     del self.nav
     def enableColor(self, colorList):
         self.useColor = True
+        self.foundColorList = []
+        self.foundColorNorth = False
+        self.foundColorEast = False
+        self.foundColorSouth = False
+        self.foundColorWest = False
         self.colorList = colorList
 
     def isWallAhead(self):
@@ -309,32 +318,40 @@ class Maze(object):
 
     def checkColor(self):
         if len(self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors) == 0 and len(self.foundColorList) != len(self.colorList) and 'none' not in self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors:
-            if self.nav.pos[1] == 3:
+            if self.nav.pos[1] == 3 and not self.foundColorNorth:
                 print('FACING NORTH')
                 self.faceDirection('n', 'hard')
-                self.checkAgainstColorList()
-            if self.nav.pos[1] == 0:
+                self.checkAgainstColorList('north')
+            if self.nav.pos[1] == 0 and not self.foundColorSouth:
                 print('FACING SOUTH')
                 self.faceDirection('s', 'hard')
-                self.checkAgainstColorList()
-            if self.nav.pos[0] == 0:
+                self.checkAgainstColorList('south')
+            if self.nav.pos[0] == 0 and not self.foundColorWest:
                 print('FACING WEST')
                 self.faceDirection('w', 'hard')
-                self.checkAgainstColorList()
-            if self.nav.pos[0] == 3:
+                self.checkAgainstColorList('west')
+            if self.nav.pos[0] == 3 and not self.foundColorEast:
                 print('FACING EAST')
                 self.faceDirection('e', 'hard')
-                self.checkAgainstColorList()
+                self.checkAgainstColorList('east')
 
-    def checkAgainstColorList(self): #called in the above function
+    def checkAgainstColorList(self, wall): #called in the above function
         addNoColorFlag = True
         for color in self.colorList:
                 stats = self.cam.getBlobStatsColored(color)
-                if stats['totalArea'] > 100000:
+                if stats['totalArea'] > 50000:
                     self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors.append(color['name'])
                     self.foundColorList.append(color)
                     self.nav.addColorToCell(color['name'])
                     addNoColorFlag = False
+                    if wall == 'north':
+                        self.foundColorNorth = True
+                    elif wall == 'south':
+                        self.foundColorSouth = True
+                    elif wall == 'east':
+                        self.foundColorEast = True
+                    elif wall == 'west':
+                        self.foundColorWest = True
                     #HERE, should mark whole row as no color todo
         if addNoColorFlag:
             self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors.append('none')
@@ -400,4 +417,10 @@ class Maze(object):
         self.waveNumberCells(goal, 0)
         self.FollowWaveNumbers()
         self.clearWaveNumbers()
+
+    def getPosition(self):
+        return {
+            'pos': self.nav.pos,
+            'heading': self.nav.heading
+        }
 

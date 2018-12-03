@@ -253,12 +253,15 @@ class Navigate(object):
                     return self.map[y][x]
 
     def addColorToCell(self, color):
-        if len(self.map[self.pos[1]][self.pos[0]].colors) == 0:
+        print(self.map[self.pos[1]][self.pos[0]].colors)
+        if len(self.map[self.pos[1]][self.pos[0]].colors) == 1:
+            print('(1)ADDING ' + color)
             self.map[self.pos[1]][self.pos[0]].miniMap[3][3] = color[0]
             self.map[self.pos[1]][self.pos[0]].miniMap[1][1] = color[0]
             self.map[self.pos[1]][self.pos[0]].miniMap[1][3] = color[0]
             self.map[self.pos[1]][self.pos[0]].miniMap[3][1] = color[0]
         else:
+            print('(2)ADDING ' + color)
             self.map[self.pos[1]][self.pos[0]].miniMap[2][1] = color[0]
             self.map[self.pos[1]][self.pos[0]].miniMap[2][3] = color[0]
             self.map[self.pos[1]][self.pos[0]].miniMap[1][2] = color[0]

@@ -13,14 +13,14 @@ colorList = []
 pink = {'minH': 152, 'minS': 120, 'minV': 85, 'maxH': 180, 'maxS': 255, 'maxV': 255, 'name': 'pink'}
 colorList.append(pink)
 
-yellow = {'minH': 20, 'minS': 125, 'minV': 65, 'maxH': 33, 'maxS': 202, 'maxV': 177, 'name': 'yellow'}
+yellow = {'minH': 17, 'minS': 235, 'minV': 129, 'maxH': 35, 'maxS': 255, 'maxV': 207, 'name': 'yellow'}
 colorList.append(yellow)
 
-green = {'minH': 44, 'minS': 140, 'minV': 83, 'maxH': 57, 'maxS': 206, 'maxV': 169, 'name': 'green'}
+green = {'minH': 29, 'minS': 209, 'minV': 79, 'maxH': 51, 'maxS': 255, 'maxV': 208, 'name': 'green'}
 colorList.append(green)
 
 # blue = {'minH': 0, 'minS': 0, 'minV': 52, 'maxH': 111, 'maxS': 58, 'maxV': 207, 'name': 'blue'}
-blue = {'minH': 69, 'minS': 0, 'minV': 135, 'maxH': 91, 'maxS': 32, 'maxV': 163, 'name': 'blue'}
+blue = {'minH': 57, 'minS': 44, 'minV': 77, 'maxH': 109, 'maxS': 160, 'maxV': 171, 'name': 'blue'}
 colorList.append(blue)
 #objects for servos, encoders, sensors, and camera
 serv = servos.Servos()
@@ -112,6 +112,10 @@ mz.enableColor(colorList)
 while True: #now can choose any option
     if options['readyToMap'] == True:
         if mz.nav.mapComplete == True: #clear map
+            tempPosition = mz.getPosition()
+            options['heading'] = tempPosition['heading'] #updates position for next run in case no new pos is input
+            options['pos'] = tempPosition['pos']
+            mz.enableColor(colorList) #clears found color list
             mz.nav.clearMap(options['pos'], options['heading'])
         mz.analyzeCell(True)
         while mz.goToNextCell():
@@ -121,7 +125,10 @@ while True: #now can choose any option
         options['mapped'] = True
 
     if options['color'] != 'unknown':
-        mz.goToCell(mz.nav.findColor(options['color']))
+        try:
+            mz.goToCell(mz.nav.findColor(options['color']))
+        except:
+            print('Error: color not found!')
         options['color'] = 'unknown'
     options = mainMenu(options)
     print(options)
