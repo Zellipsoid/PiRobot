@@ -238,13 +238,13 @@ class Navigate(object):
             cell = self.cellStack.pop()
         return cell
         
-    def clearMap(self, pos, heading):
+    def clearMap(self):
         self.map = [[None, None, None, None], [None, None, None, None], [None, None, None, None], [None, None, None, None]]
         for y in range(0, 4):
             for x in range (0, 4):
                 self.map[y][x] = Node(None, None, None, None, x, y)
-        self.pos = pos
-        self.heading = heading
+        # self.pos = pos
+        # self.heading = heading
 
     def findColor(self, color): #temporary
         for y in range(0, 4):
@@ -253,16 +253,20 @@ class Navigate(object):
                     return self.map[y][x]
 
     def addColorToCell(self, color):
-        print(self.map[self.pos[1]][self.pos[0]].colors)
+        # print(self.map[self.pos[1]][self.pos[0]].colors)
         if len(self.map[self.pos[1]][self.pos[0]].colors) == 1:
-            print('(1)ADDING ' + color)
+            # print('(1)ADDING ' + color)
             self.map[self.pos[1]][self.pos[0]].miniMap[3][3] = color[0]
             self.map[self.pos[1]][self.pos[0]].miniMap[1][1] = color[0]
             self.map[self.pos[1]][self.pos[0]].miniMap[1][3] = color[0]
             self.map[self.pos[1]][self.pos[0]].miniMap[3][1] = color[0]
         else:
-            print('(2)ADDING ' + color)
+            # print('(2)ADDING ' + color)
             self.map[self.pos[1]][self.pos[0]].miniMap[2][1] = color[0]
             self.map[self.pos[1]][self.pos[0]].miniMap[2][3] = color[0]
             self.map[self.pos[1]][self.pos[0]].miniMap[1][2] = color[0]
             self.map[self.pos[1]][self.pos[0]].miniMap[3][2] = color[0]
+
+    def setPosition(self, pos, heading):
+        self.pos = pos
+        self.heading = heading

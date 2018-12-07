@@ -101,7 +101,7 @@ def mainMenu(options):
 #Make robot stop going forward and return to cell if detects wall in front of it and less than ~2 inches moved
 #Make robot navigate randomly; will need to pass in data telling maze not to print map
 
-options = {'color': 'unknown', 'readyToMap': False, 'pos': (-1, -1), 'heading': 'unknown'}
+options = {'color': 'unknown', 'readyToMap': False, 'pos': (-1, -1), 'heading': 'unknown', 'mapped': False}
 
 while options['pos'] == (-1, -1) or options['heading'] == 'unknown': #make sure has position
     options = mainMenu(options)
@@ -112,11 +112,8 @@ mz.enableColor(colorList)
 while True: #now can choose any option
     if options['readyToMap'] == True:
         if mz.nav.mapComplete == True: #clear map
-            tempPosition = mz.getPosition()
-            options['heading'] = tempPosition['heading'] #updates position for next run in case no new pos is input
-            options['pos'] = tempPosition['pos']
             mz.enableColor(colorList) #clears found color list
-            mz.nav.clearMap(options['pos'], options['heading'])
+            mz.nav.clearMap()
         mz.analyzeCell(True)
         while mz.goToNextCell():
             pass
@@ -130,5 +127,11 @@ while True: #now can choose any option
         except:
             print('Error: color not found!')
         options['color'] = 'unknown'
+
+    tempPosition = mz.getPosition() #updates position for next run in case no new pos is input. Will be overwritten by main menu if new position is input
+    options['heading'] = tempPosition['heading']
+    options['pos'] = tempPosition['pos']
     options = mainMenu(options)
-    print(options)
+    # print(options)
+    mz.nav.setPosition(options['pos'], options['heading'])
+    # print('SETTING POSITION TO ' + str(options['pos']) + ' ' + options['heading'])

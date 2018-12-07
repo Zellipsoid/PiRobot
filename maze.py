@@ -69,10 +69,10 @@ class Maze(object):
         self.nav.updateHeadingInMap(direction)
 
     def turn(self, direction):
-        if direction == 'left':
-            print('turning left')
-        else:
-            print('turning right')
+        # if direction == 'left':
+        #     print('turning left')
+        # else:
+        #     print('turning right')
         sensorValues = [0, 0, 0, 0]
         countID = self.enc.newCount(0)
         #scan walls around, decide sensor to monitor
@@ -123,7 +123,7 @@ class Maze(object):
             # print('Found ' + str(sensorValues[-6:]))
         else:
             # print('Oh, no, the hard turning case!')
-            self.serv.setSpeedsVW(0.00001, omega3 * 1.3)
+            self.serv.setSpeedsVW(0.00001, omega3 * 1.8)
             while (self.enc.getCounts(countID)[0] + self.enc.getCounts(countID)[1]) < 29:
                 pass
         self.serv.stopServos()
@@ -132,7 +132,7 @@ class Maze(object):
         self.nav.updateHeadingInMap(direction)
     
     def faceDirection(self, newHeading, turnType):
-        print('turning ' + newHeading)
+        # print('turning ' + newHeading)
         if turnType == 'sensor':
             if self.nav.heading == 'n' and newHeading == 's'or self.nav.heading == 's' and newHeading == 'n' or self.nav.heading == 'e' and newHeading == 'w' or self.nav.heading == 'w' and newHeading == 'e':
                 if self.isWallLeft():
@@ -175,7 +175,7 @@ class Maze(object):
     def goForward(self):
         # self.enc.resetMainCounts()
         countID = self.enc.newCount(0)
-        print('going straight #' + str(countID))
+        # print('going straight #' + str(countID))
         countIDstraighten = self.enc.newCount(50) #this one is to keep path straight
         while sum(self.enc.getCountsInInches(countID)) / 2 < self.distanceBetweenSquares: 
             left = self.sens.getProxLeftInches()
@@ -319,19 +319,19 @@ class Maze(object):
     def checkColor(self):
         if len(self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors) == 0 and len(self.foundColorList) != len(self.colorList) and 'none' not in self.nav.map[self.nav.pos[1]][self.nav.pos[0]].colors:
             if self.nav.pos[1] == 3 and not self.foundColorNorth:
-                print('FACING NORTH')
+                # print('FACING NORTH')
                 self.faceDirection('n', 'hard')
                 self.checkAgainstColorList('north')
             if self.nav.pos[1] == 0 and not self.foundColorSouth:
-                print('FACING SOUTH')
+                # print('FACING SOUTH')
                 self.faceDirection('s', 'hard')
                 self.checkAgainstColorList('south')
             if self.nav.pos[0] == 0 and not self.foundColorWest:
-                print('FACING WEST')
+                # print('FACING WEST')
                 self.faceDirection('w', 'hard')
                 self.checkAgainstColorList('west')
             if self.nav.pos[0] == 3 and not self.foundColorEast:
-                print('FACING EAST')
+                # print('FACING EAST')
                 self.faceDirection('e', 'hard')
                 self.checkAgainstColorList('east')
 
